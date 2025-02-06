@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Create rep">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/excel.py" afterDir="false" />
+    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Creata directory per excel">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/excel.py" beforeDir="false" afterPath="$PROJECT_DIR$/excel.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +65,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1738840560146</updated>
-      <workItem from="1738840561049" duration="807000" />
+      <workItem from="1738840561049" duration="1165000" />
     </task>
     <task id="LOCAL-00001" summary="Create rep">
       <option name="closed" value="true" />
@@ -80,7 +83,23 @@
       <option name="project" value="LOCAL" />
       <updated>1738841116477</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Creatto file excel.py con metodi per modifica excel">
+      <option name="closed" value="true" />
+      <created>1738841422072</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1738841422072</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Creata directory per excel">
+      <option name="closed" value="true" />
+      <created>1738841455149</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1738841455149</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -88,6 +107,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create rep" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create rep" />
+    <MESSAGE value="Creatto file excel.py con metodi per modifica excel" />
+    <MESSAGE value="Creata directory per excel" />
+    <option name="LAST_COMMIT_MESSAGE" value="Creata directory per excel" />
   </component>
 </project>
