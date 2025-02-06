@@ -17,9 +17,20 @@ N18:N28 Somma Spese CC
 
 N2:N13 Saldo attuale all'8 del mese ( da febbraio a Gennaio dell'anno successivo )
 '''
+class Excel:
+    def __init__(self, utente, id):
+        self.file, self.wb = carica_file(utente)
+        self.utente = utente
+        self.id = id
 
-
-
+    def  getUtente(self):
+        return self.utente
+    def getId(self):
+        return self.id
+    def getFile(self):
+        return self.file
+    def getWb(self):
+        return self.wb
 
 
 diz_mesi = {
@@ -27,14 +38,7 @@ diz_mesi = {
      'Spese':{1: 17, 2: 18, 3: 19, 4: 20, 5: 21, 6: 22, 7: 23, 8: 24, 9: 25, 10: 26, 11: 27, 12: 28}
             }
 
-def is_file_open(file_path):
-    try:
-        # Tentativo di apertura del file in modalità append (solo lettura)
-        with open(file_path, 'a'):
-            return False  # Il file non è aperto
-    except IOError:
-        # Se solleva un IOError, significa che il file è aperto in un altro programma
-        return True
+
 
 def carica_file(utente):
     file = 'Registri/Riepilogo_Spese_' + utente  + '.xlsx'
@@ -95,23 +99,27 @@ def add_stipendio( anno, mese,stipendio, wb, file):
     sheet.cell(diz_mesi['Tot'][mese], 4, value=stipendio)
     wb.save(file)
 
-
+def add_entrate( anno, mese,stipendio, wb, file):
+    sheet = wb[anno]
+    stipendio += sheet.cell(diz_mesi['Tot'][mese],5).value
+    sheet.cell(diz_mesi['Tot'][mese], 5, value=stipendio)
+    wb.save(file)
 
 def add_spesa_varia( anno, mese, spesa, wb, file):
     sheet = wb[anno]
-    spesa += sheet.cell(diz_mesi['Spesa'][mese], 4).value
+    spesa += sheet.cell(diz_mesi['Spese'][mese], 4).value
     sheet.cell(diz_mesi['Spese'][mese], 4, value=spesa)
     wb.save(file)
 
 def add_bonifico_condiviso( anno, mese, spesa, wb, file):
     sheet = wb[anno]
-    spesa += sheet.cell(diz_mesi['Spesa'][mese], 5).value
+    spesa += sheet.cell(diz_mesi['Spese'][mese], 5).value
     sheet.cell(diz_mesi['Spese'][mese], 5, value=spesa)
     wb.save(file)
 
 def add_rata_cofidis( anno, mese, spesa, wb, file):
     sheet = wb[anno]
-    spesa += sheet.cell(diz_mesi['Spesa'][mese], 6).value
+    spesa += sheet.cell(diz_mesi['Spese'][mese], 6).value
     sheet.cell(diz_mesi['Spese'][mese], 6, value=spesa)
     wb.save(file)
 
