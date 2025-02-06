@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Creata directory per excel">
+    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="add excel dir">
+      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Edo.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Edo.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/excel.py" beforeDir="false" afterPath="$PROJECT_DIR$/excel.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,6 +25,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "faciolox"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/faciolox/Registro-Spese.git",
+    "accountId": "cf4e9443-0d03-4b2e-a871-31d32f61b9b7"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 3
 }]]></component>
@@ -37,6 +51,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Python.excel.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
@@ -65,7 +80,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1738840560146</updated>
-      <workItem from="1738840561049" duration="1165000" />
+      <workItem from="1738840561049" duration="6594000" />
     </task>
     <task id="LOCAL-00001" summary="Create rep">
       <option name="closed" value="true" />
@@ -99,7 +114,23 @@
       <option name="project" value="LOCAL" />
       <updated>1738841455149</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="change name excel">
+      <option name="closed" value="true" />
+      <created>1738841971213</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1738841971213</updated>
+    </task>
+    <task id="LOCAL-00006" summary="add excel dir">
+      <option name="closed" value="true" />
+      <created>1738842020702</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1738842020702</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,6 +140,11 @@
     <MESSAGE value="Create rep" />
     <MESSAGE value="Creatto file excel.py con metodi per modifica excel" />
     <MESSAGE value="Creata directory per excel" />
-    <option name="LAST_COMMIT_MESSAGE" value="Creata directory per excel" />
+    <MESSAGE value="change name excel" />
+    <MESSAGE value="add excel dir" />
+    <option name="LAST_COMMIT_MESSAGE" value="add excel dir" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/RegistroSpese$excel.coverage" NAME="excel Coverage Results" MODIFIED="1738850008309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
