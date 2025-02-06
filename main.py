@@ -8,6 +8,18 @@ from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQ
 import excel
 TOKEN_API = '7101960618:AAFdwl7hm7LSO9cbNY40JG6h19bSgEW5eX8'
 
+COMMANDS = {"start" : "Crea l'utente",
+            "saldo" : "Visualizza il saldo previsto",
+            "speseVarie" : "Visualizza la somma delle spese",
+            "addebitoCc" : "Visualizza il prossimo addebito della carta dui credito",
+            "sommaSpese" : "Visualizza la somma delle spese",
+            "add" : "Aggiungi un entrata",
+            "addSpesa" : "Aggiungi una spesa",
+            "addSpesaCc" : "Aggiungi una spesa per la carta di credito",
+            "report" : "Visualizza il report mensile",
+            "help" : "Visualizza tutti i comandi"
+
+}
 
 lista_utenti = {}
 lista_wb_utenti = []
@@ -73,7 +85,6 @@ async def saldoSommaSpese(update: Update, context: CallbackContext):
             await update.message.reply_text(f"In questo mese hai speso in totale: {saldo}")
             return
     await update.message.reply_text("Problema nella lettura del file dell'utente")
-
 
 async def addebitoCc(update: Update, context: CallbackContext):
     for wb in lista_wb_utenti:
@@ -151,7 +162,11 @@ async def addSpesaCc(update: Update, context: CallbackContext):
                 return
     await update.message.reply_text("Problema nella lettura del file dell'utente")
 
+async def help_command(update: Update, context: CallbackContext):
+    help_text = "Ecco i comandi disponibili:\n\n"
+    help_text += "\n".join(f"{cmd} - {desc}" for cmd, desc in COMMANDS.items())
 
+    await update.message.reply_text(help_text)
 
 async def report(update: Update, context: CallbackContext):
     for wb in lista_wb_utenti:
@@ -186,6 +201,7 @@ def main():
     application.add_handler(CommandHandler("addSpesa", addSpesaVaria))
     application.add_handler(CommandHandler("addSpesaCc", addSpesaCc))
     application.add_handler(CommandHandler("report", report))
+    application.add_handler(CommandHandler("help", help_command))
     # Avvia il bot
     application.run_polling()
 
