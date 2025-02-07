@@ -2,6 +2,7 @@ import datetime
 import json
 import math
 
+from telegram import ReplyKeyboardMarkup
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, filters, MessageHandler, CommandHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
@@ -416,6 +417,8 @@ async def add_entrata(update: Update, context: CallbackContext):
         print(f"{e}")
         await update.message.reply_text(f"{e}")
 
+
+
 async def getSaldo(update: Update, context: CallbackContext):
     string_out = ''
     try:
@@ -443,6 +446,14 @@ async def getSaldo(update: Update, context: CallbackContext):
                     await update.message.reply_text(f"{out_entrate}\n{out_spese}\n{out_entrate_prec}\n{out_spese_prec}\n{out}")
 
 
+async def showButtons(update, context):
+    keyboard = [["/start", "/addSpesa"], ["/getSpesa", "/addSpesaCc"], ["/addEntrata","/getEntrate"],["/getSaldo"]]
+    reply_markup = ReplyKeyboardMarkup(
+        keyboard, resize_keyboard=True, one_time_keyboard=False, input_field_placeholder="Scegli un'opzione"
+    )
+
+    await update.message.reply_text("Seleziona un'opzione:", reply_markup=reply_markup)
+
 
 def main():
     # Sostituisci con il token che ti ha dato BotFather
@@ -457,12 +468,12 @@ def main():
 
     # Aggiungi il gestore per il comando /start
     application.add_handler(CommandHandler("start", start_json))
-    application.add_handler(CommandHandler("addSpesa", add_spesa))
-    application.add_handler(CommandHandler("getSpese", get_spesa))
-    application.add_handler(CommandHandler("addSpesaCc", add_spesa_cc))
-    application.add_handler(CommandHandler("addEntrata", add_entrata))
-    application.add_handler(CommandHandler("getEntrate", get_entrate))
-    application.add_handler(CommandHandler("getSaldo", getSaldo))
+    application.add_handler(CommandHandler("add_spesa", add_spesa))
+    application.add_handler(CommandHandler("get_spese", get_spesa))
+    application.add_handler(CommandHandler("add_spesa_cc", add_spesa_cc))
+    application.add_handler(CommandHandler("add_entrata", add_entrata))
+    application.add_handler(CommandHandler("get_entrate", get_entrate))
+    application.add_handler(CommandHandler("get_saldo", getSaldo))
     """    
     application.add_handler(CommandHandler("saldo", saldoMensileCurr))
     application.add_handler(CommandHandler("speseVarie", spese))
