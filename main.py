@@ -4,12 +4,12 @@ import math
 
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQueryHandler
+from telegram.ext import Application, filters, MessageHandler, CommandHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
 import excel
 from excel import add_stipendio
 import spese
 TOKEN_API = '7101960618:AAFdwl7hm7LSO9cbNY40JG6h19bSgEW5eX8'
-
+user_data = {}
 COMMANDS = {"start" : "Crea l'utente",
             "saldo" : "Visualizza il saldo previsto",
             "speseVarie" : "Visualizza la somma delle spese",
@@ -22,7 +22,7 @@ COMMANDS = {"start" : "Crea l'utente",
             "help" : "Visualizza tutti i comandi"
 
 }
-
+ASK_RATES = 1
 lista_utenti = {}
 lista_wb_utenti = []
 # Funzione che gestisce il comando /start
@@ -332,9 +332,34 @@ async def get_spesa(update: Update, context: CallbackContext):
         else:
             await update.message.reply_text("Non ci sono spese per il mese corrente")
 
-
-
-
+async def add_spesa_cc(update: Update, context: CallbackContext) -> int:
+    try:
+        split = update.message.text.split()[1:]
+        try:
+            amount = float(split[0])
+        except:
+            await update.message.reply_text("Inserisci un valore valido")
+            return
+        try:
+            mensilità = int(split[1])
+        except IndexError:
+            mensilità = 1
+        finally:
+            with open('Registri/registri.json', 'r') as f:
+                lista = json.load(f)
+            for utente, report in lista.items():
+                if utente == update.message.from_user.username:
+                    spese.add_addebito_cc(report["Spese"],amount,mensilità)
+                    
+                    await update.message.reply_text("Addebito correttamente inserito")
+                    with open('Registri/registri.json', 'w') as f:
+                        json.dump(lista, f)
+                    return
+                
+            
+    except Exception as e:
+        print(f"{e}")
+        await update.message.reply_text("Inserisci un valore valido")
 
 def is_valid_number(s):
     try:
@@ -350,11 +375,16 @@ def main():
 
     ## Crea l'oggetto Application
     application = Application.builder().token(token).build()
+    
+    
+
+    
 
     # Aggiungi il gestore per il comando /start
     application.add_handler(CommandHandler("start", start_json))
     application.add_handler(CommandHandler("addSpesa", add_spesa))
     application.add_handler(CommandHandler("getSpese", get_spesa))
+    application.add_handler(CommandHandler("addSpesaCc", add_spesa_cc))
     """    
     application.add_handler(CommandHandler("saldo", saldoMensileCurr))
     application.add_handler(CommandHandler("speseVarie", spese))
