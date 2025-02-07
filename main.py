@@ -293,7 +293,7 @@ async def add_spesa(update: Update, context: CallbackContext):
                         return
 
                     try:
-                        descrizione = split[2]
+                        descrizione = " ".join(split[2:])
                         out = spese.add_spesa(liste["Spese"], spesa, descrizione)
                     except IndexError:
                         out = spese.add_spesa(liste["Spese"], spesa)
@@ -402,7 +402,7 @@ async def add_entrata(update: Update, context: CallbackContext):
                     entrata = entrata.replace(',', '.')
                     entrata = float(entrata)
                     try:
-                        descrizione = update.message.text.split()[2]
+                        descrizione = " ".join(update.message.text.split()[2:])
                     except:
                         descrizione = ""
                     finally:

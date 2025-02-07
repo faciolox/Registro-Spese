@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Corretti alcuni bug">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Registri/registri.json" beforeDir="false" afterPath="$PROJECT_DIR$/Registri/registri.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="aggiornati i nomi dei comandi" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -112,7 +108,7 @@
       <option name="presentableId" value="Default" />
       <updated>1738840560146</updated>
       <workItem from="1738840561049" duration="16062000" />
-      <workItem from="1738922201757" duration="23675000" />
+      <workItem from="1738922201757" duration="24010000" />
     </task>
     <task id="LOCAL-00001" summary="Create rep">
       <option name="closed" value="true" />
@@ -258,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738965638622</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="aggiornati i nomi dei comandi">
+      <option name="closed" value="true" />
+      <created>1738966941914</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1738966941914</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -292,7 +296,8 @@
     <MESSAGE value="aggiunto ragionamento in json" />
     <MESSAGE value="aggiunto get saldo" />
     <MESSAGE value="Corretti alcuni bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="Corretti alcuni bug" />
+    <MESSAGE value="aggiornati i nomi dei comandi" />
+    <option name="LAST_COMMIT_MESSAGE" value="aggiornati i nomi dei comandi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -332,6 +337,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RegistroSpese$excel.coverage" NAME="excel Coverage Results" MODIFIED="1738850008309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738966140750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738966881158" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
