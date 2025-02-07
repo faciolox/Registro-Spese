@@ -283,18 +283,19 @@ async def add_spesa(update: Update, context: CallbackContext):
                 if utente == update.message.from_user.username:
                     split = update.message.text.split()
                     try:
+                        split[1] = split[1].replace(',', '.')
                         spesa = float(split[1])
                     except IndexError:
                         spesa = 0
                     except:
                         await update.message.reply_text("Hai inserito un valore non valido")
                         return
-                    finally:
-                        try:
-                            descrizione = split[2]
-                            out = spese.add_spesa(liste["Spese"], spesa, descrizione)
-                        except IndexError:
-                            out = spese.add_spesa(liste["Spese"], spesa)
+
+                    try:
+                        descrizione = split[2]
+                        out = spese.add_spesa(liste["Spese"], spesa, descrizione)
+                    except IndexError:
+                        out = spese.add_spesa(liste["Spese"], spesa)
                 break
         with open('Registri/registri.json', 'w') as f:
             json.dump(lista_utenti, f)
@@ -341,6 +342,7 @@ async def add_spesa_cc(update: Update, context: CallbackContext) -> int:
     try:
         split = update.message.text.split()[1:]
         try:
+            split[0] = split[0].replace(',', '.')
             amount = float(split[0])
         except:
             await update.message.reply_text("Inserisci un valore valido")
@@ -396,6 +398,8 @@ async def add_entrata(update: Update, context: CallbackContext):
             if utente == update.message.from_user.username:
                 try:
                     entrata = update.message.text.split()[1]
+                    entrata = entrata.replace(',', '.')
+                    entrata = float(entrata)
                     try:
                         descrizione = update.message.text.split()[2]
                     except:
@@ -415,7 +419,7 @@ async def add_entrata(update: Update, context: CallbackContext):
 async def getSaldo(update: Update, context: CallbackContext):
     string_out = ''
     try:
-        mese = update.message.text.split()[1]
+        mese = int(update.message.text.split()[1])
         if mese > 12 or mese < 1:
             await update.message.reply_text("Inserisci un valore valido")
             return

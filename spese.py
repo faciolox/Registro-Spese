@@ -29,20 +29,22 @@ def get_spesa_mensile(json_spese: [Spesa], mese = None, anno = datetime.now().ye
     # Definizione range
     out = []
     totale = 0
+    now = datetime.today()
     if not (mese):
-        now = datetime.today()
+
 
         mese = now.month
-        giorno = now.day
-        if giorno < 8:
-            if mese == 1:
-                mese = 12
-                anno = anno -1
-            else:
-                mese -= 1
+
     elif mese == 0:
         mese = 12
         anno = anno - 1
+    giorno = now.day
+    if giorno < 8:
+        if mese == 1:
+            mese = 12
+            anno = anno - 1
+        else:
+            mese -= 1
     inizio, fine = datetime(anno, mese, 8), datetime(anno if mese < 12 else anno + 1, (mese % 12) + 1, 8)
     for v in json_spese:
         if inizio <= datetime.strptime(v["Orario"], "%d/%m/%Y %H:%M") < fine:

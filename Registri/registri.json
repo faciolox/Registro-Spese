@@ -1,1 +1,1 @@
-{"Faciolo": {"Spese": [], "Entrate": []}}
+{"Faciolo": {"Spese": [{"Orario": "07/02/2025 22:43", "Descrizione": "SpesaGennaio", "Importo": 1107.67}, {"Orario": "07/03/2025 23:59", "Descrizione": "Addebito c/c", "Importo": 86.4}], "Entrate": [{"Orario": "07/02/2025 22:46", "Descrizione": "entrateGennaio", "Importo": 1108.92}]}}

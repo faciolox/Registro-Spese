@@ -25,28 +25,31 @@ class Entrate:
 
 
 
-def add_entrata(json_entrate: [Entrate], entrata,descrizione = None):
-    entrata = Entrate(entrata, descrizione)
-    json_entrate.append(entrata.to_dict())
-    return entrata
+def add_entrata(json_entrate: [Entrate], entrata ,descrizione = None):
+    entr= Entrate(entrata, descrizione)
+    json_entrate.append(entr.to_dict())
+    return entr
 
 def get_entrate_mensile(json_entrate: [Entrate], mese = None, anno = datetime.now().year):
     # Definizione range
     out = []
     totale = 0
+    now = datetime.today()
+
     if not (mese):
-        now = datetime.today()
+
         mese = now.month
-        giorno = now.day
-        if giorno < 8:
-            if mese == 1:
-                mese = 12
-                anno = anno -1
-            else:
-                mese -= 1
+
     elif mese == 0:
         mese = 12
         anno = anno - 1
+    giorno = now.day
+    if giorno < 8:
+        if mese == 1:
+            mese = 12
+            anno = anno - 1
+        else:
+            mese -= 1
     inizio, fine = datetime(anno, mese, 8), datetime(anno if mese < 12 else anno + 1, (mese % 12) + 1, 8)
     for v in json_entrate:
         if inizio <= datetime.strptime(v["Orario"], "%d/%m/%Y %H:%M") < fine:
