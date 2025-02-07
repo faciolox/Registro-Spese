@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="aggiornati i nomi dei comandi" />
+    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Aggiunto feature per mettere nomi con piu parole nelle descrizioni" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -108,7 +108,7 @@
       <option name="presentableId" value="Default" />
       <updated>1738840560146</updated>
       <workItem from="1738840561049" duration="16062000" />
-      <workItem from="1738922201757" duration="24010000" />
+      <workItem from="1738922201757" duration="24319000" />
     </task>
     <task id="LOCAL-00001" summary="Create rep">
       <option name="closed" value="true" />
@@ -262,7 +262,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738966941914</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Aggiunto feature per mettere nomi con piu parole nelle descrizioni">
+      <option name="closed" value="true" />
+      <created>1738967310175</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1738967310175</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -297,7 +305,8 @@
     <MESSAGE value="aggiunto get saldo" />
     <MESSAGE value="Corretti alcuni bug" />
     <MESSAGE value="aggiornati i nomi dei comandi" />
-    <option name="LAST_COMMIT_MESSAGE" value="aggiornati i nomi dei comandi" />
+    <MESSAGE value="Aggiunto feature per mettere nomi con piu parole nelle descrizioni" />
+    <option name="LAST_COMMIT_MESSAGE" value="Aggiunto feature per mettere nomi con piu parole nelle descrizioni" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -314,11 +323,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>280</line>
-          <option name="timeStamp" value="61" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
           <line>342</line>
           <option name="timeStamp" value="63" />
         </line-breakpoint>
@@ -332,11 +336,16 @@
           <line>423</line>
           <option name="timeStamp" value="67" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>341</line>
+          <option name="timeStamp" value="68" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RegistroSpese$excel.coverage" NAME="excel Coverage Results" MODIFIED="1738850008309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738966881158" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738967189440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

@@ -323,7 +323,7 @@ async def get_spesa(update: Update, context: CallbackContext):
                 lista_utenti = json.load(f)
                 for utente, liste in lista_utenti.items():
                     if utente == update.message.from_user.username:
-                      out = spese.get_spesa_intervallo(liste["Spese"],inizio)
+                      out = spese.get_spesa_mensile(liste["Spese"],int(inizio))
     except IndexError:
         with open('Registri/registri.json', 'r') as f:
             lista_utenti = json.load(f)

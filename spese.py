@@ -71,7 +71,7 @@ def add_addebito_cc(json_spese:[Spesa],spesa,mensilità):
                     found = True
                     break
             if not found:
-                sp = Spesa(rata,"Addebito c/c",datetime(year,m + 1,7,23,59))
+                sp = Spesa(rata,"Addebito c/c",datetime(year,m + 1,4,23,59))
                 json_spese.append(sp) 
         else:
             for j in json_spese:
@@ -81,9 +81,9 @@ def add_addebito_cc(json_spese:[Spesa],spesa,mensilità):
                     break
             if not found:
                 if m + 1 == 13:
-                    sp = Spesa(rata,"Addebito c/c",datetime(year,1,7,23,59))
+                    sp = Spesa(rata,"Addebito c/c",datetime(year,1,4,23,59))
                 else:
-                    sp = Spesa(rata,"Addebito c/c",datetime(year,m +1,7,23,59))
+                    sp = Spesa(rata,"Addebito c/c",datetime(year,m +1,4,23,59))
                 json_spese.append(sp.to_dict()) 
 
 def add_spesa(json_spese: [Spesa], spesa,descrizione = None):
