@@ -115,7 +115,14 @@ def get_somma_spese_cc(anno,mese,wb):
 
 def add_stipendio( anno, mese,stipendio, wb, file):
     sheet = wb[anno]
-    sheet.cell(diz_mesi['Tot'][mese], 4, value=stipendio)
+    if mese - 1 == 0:
+        try:
+            sheet = wb[int(anno) - 1]
+            sheet.cell(diz_mesi['Tot'][12], 4, value=stipendio)
+        except:
+            sheet.cell(diz_mesi['Tot'][mese], 4, value=stipendio)
+    else:
+        sheet.cell(diz_mesi['Tot'][mese-1], 4, value=stipendio)
     wb.save(file)
 
 def add_entrate( anno, mese,stipendio, wb, file):
