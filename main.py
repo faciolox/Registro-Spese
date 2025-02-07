@@ -5,9 +5,14 @@ import math
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, filters, MessageHandler, CommandHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
+
+import entrate
 import excel
+from entrate import Entrate
 from excel import add_stipendio
 import spese
+from spese import Spesa
+
 TOKEN_API = '7101960618:AAFdwl7hm7LSO9cbNY40JG6h19bSgEW5eX8'
 user_data = {}
 COMMANDS = {"start" : "Crea l'utente",
@@ -22,7 +27,7 @@ COMMANDS = {"start" : "Crea l'utente",
             "help" : "Visualizza tutti i comandi"
 
 }
-ASK_RATES = 1
+"""ASK_RATES = 1
 lista_utenti = {}
 lista_wb_utenti = []
 # Funzione che gestisce il comando /start
@@ -244,7 +249,7 @@ async def add_stipendio(update: Update, context: CallbackContext):
             else:
                 await update.message.reply_text("Hai inserito un valore non valido")
                 return
-    await update.message.reply_text("Problema nella lettura del file dell'utente")
+    await update.message.reply_text("Problema nella lettura del file dell'utente")"""
 
 async def start_json(update: Update, context: CallbackContext):
     try:
@@ -361,12 +366,78 @@ async def add_spesa_cc(update: Update, context: CallbackContext) -> int:
         print(f"{e}")
         await update.message.reply_text("Inserisci un valore valido")
 
-def is_valid_number(s):
+async def get_entrate(update: Update, context: CallbackContext):
+    string_out = ''
     try:
-        float(s)
-        return True
-    except ValueError:
-        return False
+        mese = update.message.text.split()[1]
+        if mese > 12 or mese < 1:
+            await update.message.reply_text("Inserisci un valore valido")
+            return
+    except:
+        mese = datetime.datetime.now().month
+    finally:
+        with open('Registri/registri.json', 'r') as f:
+            lista_utenti = json.load(f)
+            for utente, liste in lista_utenti.items():
+                if utente == update.message.from_user.username:
+                    out = entrate.get_entrate_mensile(liste["Entrate"],mese)
+                    if len(out) > 0:
+                        for spesa in out:
+                            string_out += f"{spesa}\n"
+                        await update.message.reply_text(string_out)
+                    else:
+                        await update.message.reply_text("Non ci sono spese per il mese corrente")
+
+async def add_entrata(update: Update, context: CallbackContext):
+    try:
+        with open('Registri/registri.json', 'r') as f:
+            lista_utenti = json.load(f)
+        for utente, liste in lista_utenti.items():
+            if utente == update.message.from_user.username:
+                try:
+                    entrata = update.message.text.split()[1]
+                    try:
+                        descrizione = update.message.text.split()[2]
+                    except:
+                        descrizione = ""
+                    finally:
+                        out = entrate.add_entrata(liste["Entrate"],entrata,descrizione)
+                except IndexError:
+                    await update.message.reply_text("Inserisci un valore valido")
+                    return
+        with open('Registri/registri.json', 'w') as f:
+            json.dump(lista_utenti, f)
+            await update.message.reply_text(f"Inserito:\n{out}")
+    except Exception as e:
+        print(f"{e}")
+        await update.message.reply_text(f"{e}")
+
+async def getSaldo(update: Update, context: CallbackContext):
+    string_out = ''
+    try:
+        mese = update.message.text.split()[1]
+        if mese > 12 or mese < 1:
+            await update.message.reply_text("Inserisci un valore valido")
+            return
+    except:
+        mese = datetime.datetime.now().month
+    finally:
+        with open('Registri/registri.json', 'r') as f:
+            lista_utenti = json.load(f)
+            for utente, liste in lista_utenti.items():
+                if utente == update.message.from_user.username:
+                    out_entrate = entrate.get_entrate_mensile(liste["Entrate"], mese)[-1]
+                    out_spese = spese.get_spesa_mensile(liste["Spese"], mese)[-1]
+                    if mese == 1:
+                        mese = 13
+                    out_entrate_prec = entrate.get_entrate_mensile(liste["Entrate"], mese-1)[-1]
+                    out_spese_prec = spese.get_spesa_mensile(liste["Spese"], mese-1)[-1]
+                    out_entrate_prec.descrizione = "Totale entrate mese precedente:"
+                    out_spese_prec.descrizione = "Totale spese mese precedente:"
+                    saldo = out_entrate.importo - out_spese.importo + (out_entrate_prec.importo - out_spese_prec.importo)
+                    out = Spesa(saldo, "Saldo previsto il prossimo 8 del mese")
+                    await update.message.reply_text(f"{out_entrate}\n{out_spese}\n{out_entrate_prec}\n{out_spese_prec}\n{out}")
+
 
 
 def main():
@@ -385,6 +456,9 @@ def main():
     application.add_handler(CommandHandler("addSpesa", add_spesa))
     application.add_handler(CommandHandler("getSpese", get_spesa))
     application.add_handler(CommandHandler("addSpesaCc", add_spesa_cc))
+    application.add_handler(CommandHandler("addEntrata", add_entrata))
+    application.add_handler(CommandHandler("getEntrate", get_entrate))
+    application.add_handler(CommandHandler("getSaldo", getSaldo))
     """    
     application.add_handler(CommandHandler("saldo", saldoMensileCurr))
     application.add_handler(CommandHandler("speseVarie", spese))

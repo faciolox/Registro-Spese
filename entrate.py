@@ -30,13 +30,12 @@ def add_entrata(json_entrate: [Entrate], entrata,descrizione = None):
     json_entrate.append(entrata.to_dict())
     return entrata
 
-def get_entrate_mensile(json_entrate: [Entrate], mese = None):
+def get_entrate_mensile(json_entrate: [Entrate], mese = None, anno = datetime.now().year):
     # Definizione range
     out = []
     totale = 0
     if not (mese):
         now = datetime.today()
-        anno = now.year
         mese = now.month
         giorno = now.day
         if giorno < 8:
@@ -45,12 +44,15 @@ def get_entrate_mensile(json_entrate: [Entrate], mese = None):
                 anno = anno -1
             else:
                 mese -= 1
+    elif mese == 0:
+        mese = 12
+        anno = anno - 1
     inizio, fine = datetime(anno, mese, 8), datetime(anno if mese < 12 else anno + 1, (mese % 12) + 1, 8)
     for v in json_entrate:
         if inizio <= datetime.strptime(v["Orario"], "%d/%m/%Y %H:%M") < fine:
             sp = Entrate(v["Importo"], v["Descrizione"], datetime.strptime(v["Orario"], "%d/%m/%Y %H:%M"))
             out.append(sp)
             totale += v["Importo"]
-    tot = Entrate(totale, 'Totale:')
+    tot = Entrate(totale, 'Totale entrate:')
     out.append(tot)
     return out

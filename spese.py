@@ -25,13 +25,13 @@ class Spesa:
 
 
 
-def get_spesa_mensile(json_spese: [Spesa], mese = None):
+def get_spesa_mensile(json_spese: [Spesa], mese = None, anno = datetime.now().year):
     # Definizione range
     out = []
     totale = 0
     if not (mese):
         now = datetime.today()
-        anno = now.year
+
         mese = now.month
         giorno = now.day
         if giorno < 8:
@@ -40,13 +40,16 @@ def get_spesa_mensile(json_spese: [Spesa], mese = None):
                 anno = anno -1
             else:
                 mese -= 1
+    elif mese == 0:
+        mese = 12
+        anno = anno - 1
     inizio, fine = datetime(anno, mese, 8), datetime(anno if mese < 12 else anno + 1, (mese % 12) + 1, 8)
     for v in json_spese:
         if inizio <= datetime.strptime(v["Orario"], "%d/%m/%Y %H:%M") < fine:
             sp = Spesa(v["Importo"], v["Descrizione"], datetime.strptime(v["Orario"], "%d/%m/%Y %H:%M"))
             out.append(sp)
             totale += v["Importo"]
-    tot = Spesa(totale, 'Totale:')
+    tot = Spesa(totale, 'Totale spese:')
     out.append(tot)
     return out
 
