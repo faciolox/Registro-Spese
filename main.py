@@ -6,6 +6,8 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQueryHandler
 import excel
+from excel import add_stipendio
+
 TOKEN_API = '7101960618:AAFdwl7hm7LSO9cbNY40JG6h19bSgEW5eX8'
 
 COMMANDS = {"start" : "Crea l'utente",
@@ -37,12 +39,13 @@ async def start(update: Update, context: CallbackContext):
 # Funzione principale per avviare il bot
 
 
+
 async def saldoMensileCurr(update: Update, context: CallbackContext):
     for wb in lista_wb_utenti:
         if wb.getId() == str(update.message.from_user.id):
             split = update.message.text.split()
             if split[1:] != []:
-                if split[1].isdigit() == False or int(split[1]) < 1 or int(split[1]) > 12:
+                if  is_valid_number(split[1]) == False or float(split[1]) < 1 or float(split[1]) > 12:
                     await update.message.reply_text("Hai inserito un valore di mese non valido")
                     return
                 else:
@@ -62,7 +65,7 @@ async def spese(update: Update, context: CallbackContext):
 
             split = update.message.text.split()
             if split[1:] != []:
-                if split[1].isdigit() == False or int(split[1]) < 1 or int(split[1]) > 12:
+                if  is_valid_number(split[1]) == False or int(split[1]) < 1 or int(split[1]) > 12:
                     await update.message.reply_text("Hai inserito un valore di mese non valido")
                     return
                 else:
@@ -92,7 +95,7 @@ async def addebitoCc(update: Update, context: CallbackContext):
 
             split = update.message.text.split()
             if split[1:] != []:
-                if split[1].isdigit() == False or int(split[1]) < 1 or int(split[1]) > 12:
+                if  is_valid_number(split[1]) == False or int(split[1]) < 1 or int(split[1]) > 12:
                     await update.message.reply_text("Hai inserito un valore di mese non valido")
                     return
                 else:
@@ -114,12 +117,15 @@ async def entrate(update: Update, context: CallbackContext):
         if wb.getId() == str(update.message.from_user.id):
             split = update.message.text.split()
             if split[1:] != []:
-                if split[1].isdigit() == False:
+                split[1] = split[1].replace(',','.')
+                if  is_valid_number(split[1]) == False:
                     await update.message.reply_text("Hai inserito un valore non valido")
                     return
                 else:
-                    excel.add_entrate(str(update.message.date.year), update.message.date.month ,int(split[1]), wb.getWb(), wb.getFile())
-                    await update.message.reply_text(f"Hai aggiunto un entrata di: {int(split[1])}", parse_mode=ParseMode.HTML)
+                    excel.add_entrate(str(update.message.date.year), update.message.date.month ,float(split[1]), wb.getWb(), wb.getFile())
+                    await update.message.reply_text(f"Hai aggiunto un entrata di: {float(split[1])}", parse_mode=ParseMode.HTML)
+                    saldo = excel.get_entrate_totali(str(update.message.date.year), update.message.date.month,wb.getWb())
+                    await update.message.reply_text(f"Questo mese hai un entrata totale di: {saldo}")
                     return
             else:
                 await update.message.reply_text("Hai inserito un valore non valido")
@@ -131,12 +137,12 @@ async def addSpesaVaria(update: Update, context: CallbackContext):
         if wb.getId() == str(update.message.from_user.id):
             split = update.message.text.split()
             if split[1:] != []:
-                if split[1].isdigit() == False:
+                if  is_valid_number(split[1]) == False:
                     await update.message.reply_text("Hai inserito un valore non valido")
                     return
                 else:
-                    excel.add_spesa_varia(str(update.message.date.year), update.message.date.month ,int(split[1]), wb.getWb(), wb.getFile())
-                    await update.message.reply_text(f"Hai aggiunto una spesa di: {int(split[1])}", parse_mode=ParseMode.HTML)
+                    excel.add_spesa_varia(str(update.message.date.year), update.message.date.month ,float(split[1]), wb.getWb(), wb.getFile())
+                    await update.message.reply_text(f"Hai aggiunto una spesa di: {float(split[1])}", parse_mode=ParseMode.HTML)
                     return
             else:
                 await update.message.reply_text("Hai inserito un valore non valido")
@@ -148,13 +154,13 @@ async def addSpesaCc(update: Update, context: CallbackContext):
         if wb.getId() == str(update.message.from_user.id):
             split = update.message.text.split()
             if split[1:] != []:
-                if split[1].isdigit() == False:
+                if is_valid_number(split[1]) == False:
                     await update.message.reply_text("Hai inserito un valore non valido")
                     return
                 else:
-                    excel.add_spesa_cc(str(update.message.date.year), update.message.date.month, int(split[1]),
+                    excel.add_spesa_cc(str(update.message.date.year), update.message.date.month, float(split[1]),
                                           wb.getWb(), wb.getFile())
-                    await update.message.reply_text(f"Hai aggiunto una spesa di: {int(split[1])} con la carta di credito",
+                    await update.message.reply_text(f"Hai aggiunto una spesa di: {float(split[1])} con la carta di credito",
                                                     parse_mode=ParseMode.HTML)
                     return
             else:
@@ -184,6 +190,45 @@ async def report(update: Update, context: CallbackContext):
             saldo = math.trunc(excel.saldo_totale_mensile(str(update.message.date.year), update.message.date.month, wb.getWb()))
             await update.message.reply_text(f"Per cui hai un saldo previsto di {saldo} Euro il prossimo 8 del mese",
                                             parse_mode=ParseMode.HTML)
+
+async def send_excel(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+
+    for wb in lista_wb_utenti:
+        if wb.getId() == str(update.message.from_user.id):
+            await context.bot.send_document(chat_id=chat_id, document=open(wb.getFile(), "rb"))
+
+async def add_stipendio(update: Update, context: CallbackContext):
+    for wb in lista_wb_utenti:
+        if wb.getId() == str(update.message.from_user.id):
+            split = update.message.text.split()
+            if split[1:] != []:
+                split[1] = split[1].replace(',', '.')
+                if is_valid_number(split[1]) == False:
+                    await update.message.reply_text("Hai inserito un valore non valido")
+                    return
+                else:
+                    excel.add_stipendio(str(update.message.date.year), update.message.date.month, float(split[1]), wb.getWb(),
+                                      wb.getFile())
+                    await update.message.reply_text(f"Hai aggiunto uno stipendio di: {float(split[1])}",
+                                                    parse_mode=ParseMode.HTML)
+                    saldo = excel.get_entrate_totali(str(update.message.date.year), update.message.date.month, wb.getWb())
+                    await update.message.reply_text(f"Questo mese hai un entrata totale di: {saldo}")
+                    return
+            else:
+                await update.message.reply_text("Hai inserito un valore non valido")
+                return
+    await update.message.reply_text("Problema nella lettura del file dell'utente")
+
+
+def is_valid_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
 def main():
     # Sostituisci con il token che ti ha dato BotFather
     token = TOKEN_API
@@ -202,6 +247,7 @@ def main():
     application.add_handler(CommandHandler("addSpesaCc", addSpesaCc))
     application.add_handler(CommandHandler("report", report))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("download", send_excel))
     # Avvia il bot
     application.run_polling()
 

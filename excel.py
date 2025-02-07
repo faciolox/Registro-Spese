@@ -18,6 +18,10 @@ N18:N28 Somma Spese CC
 N2:N13 Saldo attuale all'8 del mese ( da febbraio a Gennaio dell'anno successivo )
 '''
 class Excel:
+    """
+    Classe Excel
+    contenente workbook wb, utente, id, e precorso file
+    """
     def __init__(self, utente, id):
         self.file, self.wb = carica_file(utente)
         self.utente = utente
@@ -40,6 +44,7 @@ diz_mesi = {
 
 
 
+
 def carica_file(utente):
     file = 'Registri/Riepilogo_Spese_' + utente  + '.xlsx'
     # carico il file excel
@@ -53,6 +58,9 @@ def carica_foglio(utente, anno):
     sheet = wb[anno]
     return sheet
 
+def get_entrate_totali(anno,mese,wb):
+    sheet = wb[anno]
+    return sheet.cell(diz_mesi['Tot'][mese],4).value + sheet.cell(diz_mesi['Tot'][mese],5).value
 def spesa_totale_mensile(anno, mese,wb):
     sheet = wb[anno]
     return sheet.cell(diz_mesi['Tot'][mese],8).value
@@ -95,7 +103,6 @@ def get_somma_spese_cc(anno,mese,wb):
 
 def add_stipendio( anno, mese,stipendio, wb, file):
     sheet = wb[anno]
-    stipendio += sheet.cell(diz_mesi['Tot'][mese],4).value
     sheet.cell(diz_mesi['Tot'][mese], 4, value=stipendio)
     wb.save(file)
 

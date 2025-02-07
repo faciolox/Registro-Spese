@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="aggiunti metodi get e add">
-      <change afterPath="$PROJECT_DIR$/lista_utenti.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Aggiunto il README.MD">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Edo.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Faciolo.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Faciolo.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Faciolo.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/excel.py" beforeDir="false" afterPath="$PROJECT_DIR$/excel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lista_utenti.json" beforeDir="false" afterPath="$PROJECT_DIR$/lista_utenti.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,21 +26,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "faciolox"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;faciolox&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/faciolox/Registro-Spese.git",
-    "accountId": "cf4e9443-0d03-4b2e-a871-31d32f61b9b7"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/faciolox/Registro-Spese.git&quot;,
+    &quot;accountId&quot;: &quot;cf4e9443-0d03-4b2e-a871-31d32f61b9b7&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2sfJBTSr7lfEDAtUQRQNBGBAxVt" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -55,6 +55,7 @@
     "Python.excel.executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
@@ -112,7 +113,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1738840560146</updated>
-      <workItem from="1738840561049" duration="15251000" />
+      <workItem from="1738840561049" duration="16062000" />
+      <workItem from="1738922201757" duration="3989000" />
     </task>
     <task id="LOCAL-00001" summary="Create rep">
       <option name="closed" value="true" />
@@ -170,7 +172,39 @@
       <option name="project" value="LOCAL" />
       <updated>1738850207633</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="aggiunti comandi start, saldoMensileCurr, spese, addebitoCc, saldoSommaSpese, entrate, addSpesaVaria, addSpesaCc, report">
+      <option name="closed" value="true" />
+      <created>1738858858330</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1738858858330</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Aggiunta Lista Utenti">
+      <option name="closed" value="true" />
+      <created>1738858873429</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1738858873429</updated>
+    </task>
+    <task id="LOCAL-00010" summary="aggiunto l'help">
+      <option name="closed" value="true" />
+      <created>1738859250204</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1738859250204</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Aggiunto il README.MD">
+      <option name="closed" value="true" />
+      <created>1738924061050</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1738924061050</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -183,36 +217,30 @@
     <MESSAGE value="change name excel" />
     <MESSAGE value="add excel dir" />
     <MESSAGE value="aggiunti metodi get e add" />
-    <option name="LAST_COMMIT_MESSAGE" value="aggiunti metodi get e add" />
+    <MESSAGE value="aggiunti comandi start, saldoMensileCurr, spese, addebitoCc, saldoSommaSpese, entrate, addSpesaVaria, addSpesaCc, report" />
+    <MESSAGE value="Aggiunta Lista Utenti" />
+    <MESSAGE value="aggiunto l'help" />
+    <MESSAGE value="Aggiunto il README.MD" />
+    <option name="LAST_COMMIT_MESSAGE" value="Aggiunto il README.MD" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/excel.py</url>
-          <line>88</line>
+          <line>92</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>102</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/excel.py</url>
-          <line>102</line>
-          <option name="timeStamp" value="29" />
+          <line>175</line>
+          <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RegistroSpese$excel.coverage" NAME="excel Coverage Results" MODIFIED="1738850008309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738858724622" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738925767223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
