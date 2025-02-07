@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Aggiunto il README.MD">
+    <list default="true" id="1c78702d-1c61-407e-b3c1-55a29b1711e3" name="Changes" comment="Aggiunto get_spese_totali, aggiunto add stipendio dove sostituisce lo stipendio che c'era del mese corrente e aggiunta possibilita di mettere numeri con la virgola">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Faciolo.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Registri/Riepilogo_Spese_Faciolo.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/excel.py" beforeDir="false" afterPath="$PROJECT_DIR$/excel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lista_utenti.json" beforeDir="false" afterPath="$PROJECT_DIR$/lista_utenti.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,7 +114,7 @@
       <option name="presentableId" value="Default" />
       <updated>1738840560146</updated>
       <workItem from="1738840561049" duration="16062000" />
-      <workItem from="1738922201757" duration="3989000" />
+      <workItem from="1738922201757" duration="7918000" />
     </task>
     <task id="LOCAL-00001" summary="Create rep">
       <option name="closed" value="true" />
@@ -204,7 +204,23 @@
       <option name="project" value="LOCAL" />
       <updated>1738924061050</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Aggiunto excel di chiara">
+      <option name="closed" value="true" />
+      <created>1738926402949</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1738926402949</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Aggiunto get_spese_totali, aggiunto add stipendio dove sostituisce lo stipendio che c'era del mese corrente e aggiunta possibilita di mettere numeri con la virgola">
+      <option name="closed" value="true" />
+      <created>1738926669450</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1738926669450</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -221,26 +237,28 @@
     <MESSAGE value="Aggiunta Lista Utenti" />
     <MESSAGE value="aggiunto l'help" />
     <MESSAGE value="Aggiunto il README.MD" />
-    <option name="LAST_COMMIT_MESSAGE" value="Aggiunto il README.MD" />
+    <MESSAGE value="Aggiunto excel di chiara" />
+    <MESSAGE value="Aggiunto get_spese_totali, aggiunto add stipendio dove sostituisce lo stipendio che c'era del mese corrente e aggiunta possibilita di mettere numeri con la virgola" />
+    <option name="LAST_COMMIT_MESSAGE" value="Aggiunto get_spese_totali, aggiunto add stipendio dove sostituisce lo stipendio che c'era del mese corrente e aggiunta possibilita di mettere numeri con la virgola" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/excel.py</url>
-          <line>92</line>
+          <line>108</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>175</line>
-          <option name="timeStamp" value="36" />
+          <line>226</line>
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RegistroSpese$excel.coverage" NAME="excel Coverage Results" MODIFIED="1738850008309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738925767223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RegistroSpese$main.coverage" NAME="main Coverage Results" MODIFIED="1738930187762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

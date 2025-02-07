@@ -60,6 +60,12 @@ def carica_foglio(utente, anno):
 
 def get_entrate_totali(anno,mese,wb):
     sheet = wb[anno]
+    if mese == 0:
+        mese = 12
+        try:
+            sheet = wb[int(anno)-1]
+        except:
+            return 0
     return sheet.cell(diz_mesi['Tot'][mese],4).value + sheet.cell(diz_mesi['Tot'][mese],5).value
 def spesa_totale_mensile(anno, mese,wb):
     sheet = wb[anno]
@@ -67,6 +73,12 @@ def spesa_totale_mensile(anno, mese,wb):
 
 def saldo_totale_mensile(anno, mese,wb):
     sheet = wb[anno]
+    if mese == 0:
+        mese = 12
+        try:
+            sheet = wb[int(anno)-1]
+        except:
+            return 0
     return sheet.cell(diz_mesi['Tot'][mese],14).value
 
 def get_spese_varie( anno, mese, wb):

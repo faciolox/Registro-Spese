@@ -121,6 +121,15 @@ async def entrate(update: Update, context: CallbackContext):
                 if  is_valid_number(split[1]) == False:
                     await update.message.reply_text("Hai inserito un valore non valido")
                     return
+                elif update.message.date.day < 8:
+                    excel.add_entrate(str(update.message.date.year), update.message.date.month - 1, float(split[1]),
+                                      wb.getWb(), wb.getFile())
+                    await update.message.reply_text(f"Hai aggiunto un entrata di: {float(split[1])}",
+                                                    parse_mode=ParseMode.HTML)
+                    saldo = excel.get_entrate_totali(str(update.message.date.year), update.message.date.month - 1,
+                                                     wb.getWb())
+                    await update.message.reply_text(f"Questo mese hai un entrata totale di: {saldo}")
+                    return
                 else:
                     excel.add_entrate(str(update.message.date.year), update.message.date.month ,float(split[1]), wb.getWb(), wb.getFile())
                     await update.message.reply_text(f"Hai aggiunto un entrata di: {float(split[1])}", parse_mode=ParseMode.HTML)
@@ -140,9 +149,15 @@ async def addSpesaVaria(update: Update, context: CallbackContext):
                 if  is_valid_number(split[1]) == False:
                     await update.message.reply_text("Hai inserito un valore non valido")
                     return
-                else:
-                    excel.add_spesa_varia(str(update.message.date.year), update.message.date.month ,float(split[1]), wb.getWb(), wb.getFile())
+                elif update.message.date.day < 8:
+                    excel.add_spesa_varia(str(update.message.date.year), update.message.date.month - 1 ,float(split[1]), wb.getWb(), wb.getFile())
                     await update.message.reply_text(f"Hai aggiunto una spesa di: {float(split[1])}", parse_mode=ParseMode.HTML)
+                    return
+                else:
+                    excel.add_spesa_varia(str(update.message.date.year), update.message.date.month, float(split[1]),
+                                          wb.getWb(), wb.getFile())
+                    await update.message.reply_text(f"Hai aggiunto una spesa di: {float(split[1])}",
+                                                    parse_mode=ParseMode.HTML)
                     return
             else:
                 await update.message.reply_text("Hai inserito un valore non valido")
@@ -177,18 +192,29 @@ async def help_command(update: Update, context: CallbackContext):
 async def report(update: Update, context: CallbackContext):
     for wb in lista_wb_utenti:
         if wb.getId() == str(update.message.from_user.id):
-            await update.message.reply_text(f"Ecco il report per questo mese ")
-            saldo = excel.get_somma_spese_cc(str(update.message.date.year), update.message.date.month, wb.getWb())
+            month = update.message.date.month
+            if  update.message.date.day < 8:
+                month = update.message.date.month - 1
+            await update.message.reply_text(f"Ecco il report per questo mese:")
+
+
+            saldo = excel.get_somma_spese_cc(str(update.message.date.year), month, wb.getWb())
             await update.message.reply_text(f"Hai raggiunto una spesa di: {saldo} con la carta di credito",
                                             parse_mode=ParseMode.HTML)
-            saldo = excel.get_somma_spese(str(update.message.date.year), update.message.date.month, wb.getWb())
+            saldo = excel.get_somma_spese(str(update.message.date.year), month, wb.getWb())
             await update.message.reply_text(f"Hai raggiunto una spesa di: {saldo} con la carta di debito",
                                             parse_mode=ParseMode.HTML)
-            saldo = math.trunc(excel.spesa_totale_mensile(str(update.message.date.year), update.message.date.month, wb.getWb()))
+            saldo = math.trunc(excel.spesa_totale_mensile(str(update.message.date.year), month, wb.getWb()))
             await update.message.reply_text(f"Raggiungendo un totale di {saldo} Euro",
                                             parse_mode=ParseMode.HTML)
-            saldo = math.trunc(excel.saldo_totale_mensile(str(update.message.date.year), update.message.date.month, wb.getWb()))
-            await update.message.reply_text(f"Per cui hai un saldo previsto di {saldo} Euro il prossimo 8 del mese",
+            saldo = math.trunc(excel.get_entrate_totali(str(update.message.date.year), month, wb.getWb()))
+            await  update.message.reply_text(f"A fronte di un totale di entrate di {saldo} Euro")
+
+            saldo = excel.saldo_totale_mensile(str(update.message.date.year), month - 1, wb.getWb())
+            await update.message.reply_text(f"Considerato che l'8 del mese scorso avevi un saldo di {saldo} Euro")
+
+            saldo = math.trunc(excel.saldo_totale_mensile(str(update.message.date.year), month, wb.getWb()))
+            await update.message.reply_text(f"Avrai un saldo previsto di {saldo} Euro il prossimo 8 del mese",
                                             parse_mode=ParseMode.HTML)
 
 async def send_excel(update: Update, context: CallbackContext):
@@ -248,6 +274,7 @@ def main():
     application.add_handler(CommandHandler("report", report))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("download", send_excel))
+    application.add_handler(CommandHandler("addStipendio", add_stipendio))
     # Avvia il bot
     application.run_polling()
 

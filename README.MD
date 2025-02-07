@@ -15,3 +15,7 @@ giorno in cui arriva l'accredito dello stipendio.
 
 * nohup python3 /Registro-Spese/main.py  - esegui lo script
 * pkill -f main.py - interrompi lo script
+* git clone git@github.com:faciolox/Registro-Spese.git
+* pip install python-telegram-bot
+* pip install openpyxl
+
