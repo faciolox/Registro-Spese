@@ -7,7 +7,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, CallbackContext, CallbackQueryHandler
 import excel
 from excel import add_stipendio
-
+import spese
 TOKEN_API = '7101960618:AAFdwl7hm7LSO9cbNY40JG6h19bSgEW5eX8'
 
 COMMANDS = {"start" : "Crea l'utente",
@@ -59,7 +59,7 @@ async def saldoMensileCurr(update: Update, context: CallbackContext):
             return
     await update.message.reply_text("Problema nella lettura del file dell'utente")
 
-async def spese(update: Update, context: CallbackContext):
+async def spesee(update: Update, context: CallbackContext):
     for wb in lista_wb_utenti:
         if wb.getId() == str(update.message.from_user.id):
 
@@ -246,6 +246,95 @@ async def add_stipendio(update: Update, context: CallbackContext):
                 return
     await update.message.reply_text("Problema nella lettura del file dell'utente")
 
+async def start_json(update: Update, context: CallbackContext):
+    try:
+        with open('Registri/registri.json', 'r') as f:
+            lista_utenti = json.load(f)
+            for x in lista_utenti:
+                if x == update.message.from_user.username:
+                    await update.message.reply_text(f"Utente {update.message.from_user.username} gia esistente")
+                    return
+            reg = {}
+            lista_utenti[update.message.from_user.username] = {
+                'Spese' : [], 'Entrate' : []
+            }
+
+            try:
+                 with open('Registri/registri.json', 'w') as f:
+                    json.dump(lista_utenti, f)
+                    await update.message.reply_text(f"Utente {update.message.from_user.username} inserito")
+            except Exception as e:
+                print(f"{datetime.datetime.now()}: {e}")
+                await update.message.reply_text(f"Errore nella creazione, riprovare")
+    except Exception as e2:
+        print(f"{datetime.datetime.now()}: {e2}")
+        await update.message.reply_text("Errore nella creazione")
+
+async def add_spesa(update: Update, context: CallbackContext):
+    try:
+        with open('Registri/registri.json', 'r') as f:
+            lista_utenti = json.load(f)
+            for utente, liste in lista_utenti.items():
+                if utente == update.message.from_user.username:
+                    split = update.message.text.split()
+                    try:
+                        spesa = float(split[1])
+                    except IndexError:
+                        spesa = 0
+                    except:
+                        await update.message.reply_text("Hai inserito un valore non valido")
+                        return
+                    finally:
+                        try:
+                            descrizione = split[2]
+                            out = spese.add_spesa(liste["Spese"], spesa, descrizione)
+                        except IndexError:
+                            out = spese.add_spesa(liste["Spese"], spesa)
+                break
+        with open('Registri/registri.json', 'w') as f:
+            json.dump(lista_utenti, f)
+            await update.message.reply_text(f"Inserito:\n{out}")
+    except Exception as e2:
+        print(f"{datetime.datetime.now()}: {e2}")
+        await update.message.reply_text("Errore interno ")
+
+async def get_spesa(update: Update, context: CallbackContext):
+    split = update.message.text.split()
+    string_out = ''
+    out = []
+    try:
+        inizio = split[1]
+        try:
+            fine = split[2]
+            with open('Registri/registri.json', 'r') as f:
+                lista_utenti = json.load(f)
+                for utente, liste in lista_utenti.items():
+                    if utente == update.message.from_user.username:
+                       out = spese.get_spesa_intervallo(liste["Spese"],inizio,fine)
+        except IndexError:
+            with open('Registri/registri.json', 'r') as f:
+                lista_utenti = json.load(f)
+                for utente, liste in lista_utenti.items():
+                    if utente == update.message.from_user.username:
+                      out = spese.get_spesa_intervallo(liste["Spese"],inizio)
+    except IndexError:
+        with open('Registri/registri.json', 'r') as f:
+            lista_utenti = json.load(f)
+            for utente, liste in lista_utenti.items():
+                if utente == update.message.from_user.username:
+                   out = spese.get_spesa_mensile(liste["Spese"])
+
+    finally:
+        if len(out) > 0:
+            for spesa in out:
+                string_out += f"{spesa}\n"
+            await update.message.reply_text(string_out)
+        else:
+            await update.message.reply_text("Non ci sono spese per il mese corrente")
+
+
+
+
 
 def is_valid_number(s):
     try:
@@ -263,7 +352,10 @@ def main():
     application = Application.builder().token(token).build()
 
     # Aggiungi il gestore per il comando /start
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("start", start_json))
+    application.add_handler(CommandHandler("addSpesa", add_spesa))
+    application.add_handler(CommandHandler("getSpese", get_spesa))
+    """    
     application.add_handler(CommandHandler("saldo", saldoMensileCurr))
     application.add_handler(CommandHandler("speseVarie", spese))
     application.add_handler(CommandHandler("addebitoCc", addebitoCc))
@@ -274,17 +366,9 @@ def main():
     application.add_handler(CommandHandler("report", report))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("download", send_excel))
-    application.add_handler(CommandHandler("addStipendio", add_stipendio))
+    application.add_handler(CommandHandler("addStipendio", add_stipendio))"""
     # Avvia il bot
     application.run_polling()
 
 if __name__ == '__main__':
-    with open('lista_utenti.json', 'r') as f:
-        lista_utenti = json.load(f)
-
-    for id, user in lista_utenti.items():
-        wb = excel.Excel(user,id)
-        lista_wb_utenti.append(wb)
     main()
-    with open('lista_utenti.json', 'w') as file:
-        json.dump(lista_utenti, file)
