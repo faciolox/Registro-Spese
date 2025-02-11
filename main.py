@@ -334,6 +334,7 @@ async def get_spesa(update: Update, context: CallbackContext):
     finally:
         if len(out) > 0:
             for spesa in out:
+                spesa.importo = round(spesa.importo,2)
                 string_out += f"{spesa}\n"
             await update.message.reply_text(string_out)
         else:
