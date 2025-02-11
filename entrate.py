@@ -1,5 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
+import pytz
+
+rome_tz = pytz.timezone('Europe/Rome')
 
 class Entrate:
     def __init__(self, importo, descrizione = None, timestamp = None ):
@@ -9,7 +12,7 @@ class Entrate:
         else:
             self.descrizione = descrizione
         if not(timestamp):
-            self.timestamp = datetime.now().strftime("%d/%m/%Y %H:%M")
+            self.timestamp = datetime.now(tz=rome_tz).strftime("%d/%m/%Y %H:%M")
         else:
 
             self.timestamp = timestamp.strftime("%d/%m/%Y %H:%M")

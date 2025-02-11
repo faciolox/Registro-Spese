@@ -55,11 +55,11 @@ async def saldoMensileCurr(update: Update, context: CallbackContext):
                     await update.message.reply_text("Hai inserito un valore di mese non valido")
                     return
                 else:
-                    saldo = math.trunc(excel.saldo_totale_mensile(str(update.message.date.year), int(split[1]),
+                    saldo = (excel.saldo_totale_mensile(str(update.message.date.year), int(split[1]),
                                                        wb.getWb()))
                     data = '8/' + str(int(split[1]) + 1)
             else:
-                saldo = math.trunc(excel.saldo_totale_mensile(str(update.message.date.year), update.message.date.month,wb.getWb()))
+                saldo = (excel.saldo_totale_mensile(str(update.message.date.year), update.message.date.month,wb.getWb()))
                 data = '8/' + str(update.message.date.month + 1)
             await update.message.reply_text(f"Il tuo saldo previsto per il {data} e': {saldo}")
             return
@@ -75,7 +75,7 @@ async def spesee(update: Update, context: CallbackContext):
                     await update.message.reply_text("Hai inserito un valore di mese non valido")
                     return
                 else:
-                    saldo = math.trunc(excel.get_spese_varie(str(update.message.date.year), int(split[1]),
+                    saldo = (excel.get_spese_varie(str(update.message.date.year), int(split[1]),
                                                                   wb.getWb()))
                     await update.message.reply_text(f"In questo mese hai effettuato un totale di spese varie di: {saldo}")
                     return
@@ -105,7 +105,7 @@ async def addebitoCc(update: Update, context: CallbackContext):
                     await update.message.reply_text("Hai inserito un valore di mese non valido")
                     return
                 else:
-                    saldo = math.trunc(excel.get_somma_spese_cc(str(update.message.date.year), int(split[1]),
+                    saldo = (excel.get_somma_spese_cc(str(update.message.date.year), int(split[1]),
                                                              wb.getWb()))
                     data = '5/' + str(int(split[1]) + 1)
                     await update.message.reply_text(
@@ -210,16 +210,16 @@ async def report(update: Update, context: CallbackContext):
             saldo = excel.get_somma_spese(str(update.message.date.year), month, wb.getWb())
             await update.message.reply_text(f"Hai raggiunto una spesa di: {saldo} con la carta di debito",
                                             parse_mode=ParseMode.HTML)
-            saldo = math.trunc(excel.spesa_totale_mensile(str(update.message.date.year), month, wb.getWb()))
+            saldo = (excel.spesa_totale_mensile(str(update.message.date.year), month, wb.getWb()))
             await update.message.reply_text(f"Raggiungendo un totale di {saldo} Euro",
                                             parse_mode=ParseMode.HTML)
-            saldo = math.trunc(excel.get_entrate_totali(str(update.message.date.year), month, wb.getWb()))
+            saldo = (excel.get_entrate_totali(str(update.message.date.year), month, wb.getWb()))
             await  update.message.reply_text(f"A fronte di un totale di entrate di {saldo} Euro")
 
             saldo = excel.saldo_totale_mensile(str(update.message.date.year), month - 1, wb.getWb())
             await update.message.reply_text(f"Considerato che l'8 del mese scorso avevi un saldo di {saldo} Euro")
 
-            saldo = math.trunc(excel.saldo_totale_mensile(str(update.message.date.year), month, wb.getWb()))
+            saldo = (excel.saldo_totale_mensile(str(update.message.date.year), month, wb.getWb()))
             await update.message.reply_text(f"Avrai un saldo previsto di {saldo} Euro il prossimo 8 del mese",
                                             parse_mode=ParseMode.HTML)
 
@@ -285,7 +285,7 @@ async def add_spesa(update: Update, context: CallbackContext):
                     split = update.message.text.split()
                     try:
                         split[1] = split[1].replace(',', '.')
-                        spesa = float(split[1])
+                        spesa = round(float(split[1]),2)
                     except IndexError:
                         spesa = 0
                     except:
@@ -334,6 +334,7 @@ async def get_spesa(update: Update, context: CallbackContext):
     finally:
         if len(out) > 0:
             for spesa in out:
+                spesa = round(spesa, 2)
                 string_out += f"{spesa}\n"
             await update.message.reply_text(string_out)
         else:
@@ -357,6 +358,7 @@ async def add_spesa_cc(update: Update, context: CallbackContext) -> int:
                 lista = json.load(f)
             for utente, report in lista.items():
                 if utente == update.message.from_user.username:
+                    amount = round(amount,2)
                     spese.add_addebito_cc(report["Spese"],amount,mensilità)
                     
                     await update.message.reply_text("Addebito correttamente inserito")
@@ -412,6 +414,7 @@ async def add_entrata(update: Update, context: CallbackContext):
                     return
         with open('Registri/registri.json', 'w') as f:
             json.dump(lista_utenti, f)
+            out = round(out,2)
             await update.message.reply_text(f"Inserito:\n{out}")
     except Exception as e:
         print(f"{e}")
@@ -441,7 +444,7 @@ async def getSaldo(update: Update, context: CallbackContext):
                     out_spese_prec = spese.get_spesa_mensile(liste["Spese"], mese-1)[-1]
                     out_entrate_prec.descrizione = "Totale entrate mese precedente:"
                     out_spese_prec.descrizione = "Totale spese mese precedente:"
-                    saldo = out_entrate.importo - out_spese.importo + (out_entrate_prec.importo - out_spese_prec.importo)
+                    saldo = round(out_entrate.importo,2) - round(out_spese.importo,2) + (round(out_entrate_prec.importo,2) - round(out_spese_prec.importo,2))
                     out = Spesa(saldo, "Saldo previsto il prossimo 8 del mese")
                     await update.message.reply_text(f"{out_entrate}\n{out_spese}\n{out_entrate_prec}\n{out_spese_prec}\n{out}")
 
