@@ -102,7 +102,7 @@ async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
         context.user_data['fine'] = data
         utente = update.message.from_user.username
         out = ''
-        spese = db.get_spesa(utente, context.user_data['inizio'], context.user_data['fine'])
+        spese = db.get_spesa(utente, context.user_data['fine'], context.user_data['inizio'])
         if spese == []:
             await update.message.reply_text("Nessuna spesa trovata")
             return ConversationHandler.END
@@ -217,7 +217,7 @@ async def get_entrate_quarto_stato(update: Update, context: CallbackContext):
         context.user_data['fine'] = data
         utente = update.message.from_user.username
         out = ''
-        entrate = db.get_entrata(utente, context.user_data['inizio'], context.user_data['fine'])
+        entrate = db.get_entrata(utente, context.user_data['fine'], context.user_data['inizio'])
         if entrate == []:
             await update.message.reply_text("Nessuna entrata trovata")
             return ConversationHandler.END
