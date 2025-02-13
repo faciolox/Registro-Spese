@@ -36,6 +36,16 @@ class Spesa:
     def to_dict(self):
         return {"Orario": self.timestamp, "Descrizione": self.descrizione, "Importo": self.importo}
 
+class SpesaCc(Spesa):
+    def __init__(self, importo, descrizione = None, timestamp = None, mensilità = 1):
+        super().__init__(importo, descrizione, timestamp)
+        self.mensilità = mensilità
+
+    def to_dict(self):
+        return {"Orario": self.timestamp, "Descrizione": self.descrizione, "Importo": self.importo, "Mensilità": self.mensilità}
+
+    def __str__(self):
+        return f"{self.descrizione} | {self.timestamp} | Importo: {self.importo}€ | Mensilità: {self.mensilità}"
 
 
 def get_spesa_mensile(json_spese: [Spesa], mese = None, anno = datetime.now().year):
