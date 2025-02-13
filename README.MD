@@ -18,4 +18,5 @@ giorno in cui arriva l'accredito dello stipendio.
 * git clone git@github.com:faciolox/Registro-Spese.git
 * pip install python-telegram-bot
 * pip install openpyxl
+* pip install sqlite3
 
