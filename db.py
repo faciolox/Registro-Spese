@@ -3,16 +3,29 @@ import sqlite3
 import json
 import spese, entrate
 def init_db():
+    
+    conn = sqlite3.connect("utente.db")
+    cursor = conn.cursor()
+    
+    cursor.execute( """
+                   CREATE TABLE IF NOT EXISTS utenti(
+                     utente TEXT PRIMARY KEY)
+                   """)
+    
+    conn.commit()
+    conn.close()
+    
     conn = sqlite3.connect("spese.db")  # Crea il file del database
     cursor = conn.cursor()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS spese (
             id_spesa INTEGER PRIMARY KEY AUTOINCREMENT,
-            utente_id TEXT,
+            utente TEXT,
             descrizione TEXT,
             importo REAL,
-            data DATETIME
+            data text,
+            FOREIGN KEY (utente) REFERENCES utenti(utente)
         )
     """)
 
@@ -25,16 +38,23 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS entrate (
             id_entrata INTEGER PRIMARY KEY AUTOINCREMENT,
-            utente_id TEXT,
+            utente TEXT,
             descrizione TEXT,
             importo REAL,
-            data DATETIME
+            data text,
+            FOREIGN KEY (utente) REFERENCES utenti(utente)
         )
     """)
 
     conn.commit()
     conn.close()
     
+def create (utente):
+    conn = sqlite3.connect("utente.db")
+    cursor = conn.cursor()
+    cursor.execute("""INSERT INTO utenti (utente) VALUES (?)""",(utente,))
+    conn.commit()
+    conn.close()
 
 def adapt_datetime(dt):
     return dt.strftime("%d/%m/%Y %H:%M:%S")
@@ -54,14 +74,14 @@ def trasferisci_json(file = 'Registri/registri.json'):
             ts = datetime.strptime(spese["Orario"],"%d/%m/%Y %H:%M")
             ts = ts.strftime("%d/%m/%Y %H:%M:%S")
             cursor.execute("""
-                    INSERT INTO spese (utente_id,  descrizione, importo, data) VALUES (?, ? ,?, ?)
+                    INSERT INTO spese (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
                     """, (utente, spese["Descrizione"], spese["Importo"], ts))
         for entrate in registri["Entrate"]:
             ts = datetime.strptime(spese["Orario"],"%d/%m/%Y %H:%M")
             ts = ts.strftime("%d/%m/%Y %H:%M:%S")
             cursor2.execute("""
-                    INSERT INTO entrate (utente_id,  descrizione, importo, data) VALUES (?, ? ,?, ?)
-                    """, (utente, spese["Descrizione"], spese["Importo"], ts))
+                    INSERT INTO entrate (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
+                    """, (utente, entrate["Descrizione"], entrate["Importo"], ts))
     conn.commit()
     conn2.commit()
     conn.close()
@@ -74,7 +94,7 @@ def salva_spesa(utente_id, descrizione, importo, data):
     ts = datetime.strptime(data,"%d/%m/%Y %H:%M")
     ts = ts.strftime("%d/%m/%Y %H:%M:%S")
     cursor.execute("""
-                    INSERT INTO spese (utente_id,  descrizione, importo, data) VALUES (?, ? ,?, ?)
+                    INSERT INTO spese (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
                     """, (utente_id, descrizione, importo, ts))
     conn.commit()
     conn.close()
@@ -136,5 +156,5 @@ def get_entrata(utente_id, fine=datetime.now(),inizio=None):
     return out
 
 
-print(get_entrata("Faciolo"))
-print(get_spesa("Faciolo"))
+
+trasferisci_json()
