@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import sqlite3
 import json
-import spese, entrate
+import spese, entrate, errors
 def init_db():
     
     conn = sqlite3.connect("utente.db")
@@ -36,7 +36,7 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS spese (
+        CREATE TABLE IF NOT EXISTS spese_cc (
             id_spesa INTEGER PRIMARY KEY autoincrement,
             utente TEXT,
             descrizione TEXT,
@@ -72,7 +72,10 @@ def init_db():
 def create (utente):
     conn = sqlite3.connect("utente.db")
     cursor = conn.cursor()
-    cursor.execute("""INSERT INTO utenti (utente) VALUES (?)""",(utente,))
+    try:
+        cursor.execute("""INSERT INTO utenti (utente) VALUES (?)""",(utente,))
+    except sqlite3.IntegrityError as e:
+        print(f"{e}\nUtente già esistente")
     conn.commit()
     conn.close()
 
@@ -113,9 +116,11 @@ def trasferisci_json(file = 'Registri/registri.json'):
 
 
 def salva_spesa(utente_id, descrizione, importo, data):
+    if descrizione == "Addebito carta di credito":
+        raise errors.DescriptionError("Descrizione non valida, utilizzare la funzione apposita per la carta di credito")
     conn = sqlite3.connect("spese.db")
     cursor = conn.cursor()
-    ts = datetime.strptime(data,"%d/%m/%Y %H:%M")
+    ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
     ts = ts.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
                     INSERT INTO spese (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
@@ -126,10 +131,10 @@ def salva_spesa(utente_id, descrizione, importo, data):
 def salva_entrata(utente_id, descrizione, importo, data):
     conn = sqlite3.connect("entrate.db")
     cursor = conn.cursor()
-    ts = datetime.strptime(data,"%d/%m/%Y %H:%M")
+    ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
     ts = ts.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
-                    INSERT INTO entrate (utente_id,  descrizione, importo, data) VALUES (?, ? ,?, ?)
+                    INSERT INTO entrate (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
                     """, (utente_id, descrizione, importo, ts))
     conn.commit()
     conn.close()
@@ -183,5 +188,93 @@ def get_entrata(utente_id, fine=datetime.now(),inizio=None):
     out.append(spesa)
     return out
 
+def add_spesa_cc(utente,importo,descrizione = '',data = datetime.now(), mensilita=1 ):
+    conn = sqlite3.connect("spese_cc.db")
+    cursor = conn.cursor()
+    if type(data) == str:
+        ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
+        ts = ts.strftime("%Y/%m/%d %H:%M:%S")
+    else:
+        ts = data.strftime("%Y/%m/%d %H:%M:%S")
 
-print(get_entrata("Faciolo"))
+    cursor.execute("""
+                    INSERT INTO spese_cc (utente,  descrizione, importo, data, mensilita) VALUES (?, ? ,?, ?, ?)
+                    """, (utente, descrizione, importo, ts, mensilita))
+    conn.commit()
+    conn.close()
+    
+    conn = sqlite3.connect("spese.db")
+    cursor = conn.cursor()
+    ts_dt = datetime.strptime(ts,"%Y/%m/%d %H:%M:%S")
+    if ts_dt.day < 8:
+        ts_dt.day = 9
+        ts = ts_dt.strftime("%Y/%m/%d %H:%M:%S")
+    cursor.execute("""
+                   SELECT * FROM spese WHERE utente  = ? AND data > ? and descrizione = ? ORDER BY data ASC """
+                   ,(utente,ts,"Addebito carta di credito"))
+    risultati = cursor.fetchall()
+    for i in range(1,mensilita+1):
+        found = False
+        if ts_dt.month + i > 12:
+            ts_dt.month = 1
+            ts_dt.year += 1
+            ts_addebito = datetime(ts_dt.year+1,1,4,23,59,59).strftime("%Y/%m/%d %H:%M:%S")
+        else:
+            ts_addebito = datetime(ts_dt.year,ts_dt.month+i,4,23,59,59).strftime("%Y/%m/%d %H:%M:%S")
+        for addebbiti_cc in risultati:
+            if addebbiti_cc[4] == ts_addebito:
+                importo = round(addebbiti_cc[3] + (importo/mensilita),2)
+                cursor.execute("""
+                    UPDATE spese SET importo = ? WHERE id_spesa = ?
+                    """,(importo ,addebbiti_cc[0]))
+                found = True
+                break
+        if not found:
+            cursor.execute("""
+                    INSERT INTO spese (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
+                    """, (utente, "Addebito carta di credito", round(importo/mensilita,2), ts_addebito))
+    conn.commit()
+    conn.close()
+    
+def get_saldo(utente):
+    fine = datetime.now()
+    if fine.day >= 8:
+        if fine.month == 12:
+
+            fine = datetime(fine.year + 1, 1,fine.day,fine.hour,fine.minute,fine.second)
+        else:
+            fine = datetime(fine.year, fine.month+1,fine.day,fine.hour,fine.minute,fine.second)
+    else:
+        fine = datetime(fine.year, fine.month, 8, fine.hour, fine.minute, fine.second)
+    fine = fine.strftime("%Y/%m/%d %H:%M:%S")
+    inizio = datetime(1900, 1,1,0,0,0).strftime("%Y/%m/%d %H:%M:%S")
+    
+    conn = sqlite3.connect("spese.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT * FROM spese WHERE utente = ? AND data BETWEEN ? AND ?
+                   """, (utente,inizio,fine))
+    risultati = cursor.fetchall()
+    totale_spese = 0
+    for spesa in risultati:
+        totale_spese += spesa[3]
+    conn.close()
+    conn = sqlite3.connect("entrate.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT * FROM entrate WHERE utente = ?AND data BETWEEN ? AND ?
+                   """, (utente,inizio,fine))
+    risultati = cursor.fetchall()
+    totale_entrate = 0
+    for entrata in risultati:
+        totale_entrate += entrata[3]
+    conn.close()
+    return totale_entrate - totale_spese
+
+  
+init_db()       
+create("Faciolo")
+salva_entrata("Faciolo","Stipendio", 1300, "2025/02/13 14:59:00")
+add_spesa_cc("Faciolo",1000,"tv","2025/02/13 14:59:00",6)
+add_spesa_cc("Faciolo",100, "cena")
+print(get_saldo("Faciolo"))
