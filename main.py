@@ -293,6 +293,18 @@ async def add_spesa_cc_state5(update: Update, context: CallbackContext):
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova \n{e}")   
     
+
+async def get_spese_cc(update: Update, context: CallbackContext):
+    try:
+        utente = update.message.from_user.username
+        spese = db.get_spese_cc(utente)
+        out = ''
+        for spesa in spese:
+            out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€ | Mensilita: {spesa.mensilita} | Rata: {round(spesa.importo/spesa.mensilita,2)}\n"
+        await update.message.reply_text(f"Spese:\n {out}")
+    except Exception as e:
+        await update.message.reply_text(f"Errore, riprova {e}")
+
     
 def main():
     # Sostituisci con il token che ti ha dato BotFather

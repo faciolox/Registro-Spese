@@ -173,8 +173,10 @@ def get_entrata(utente_id, fine=datetime.now(),inizio=None):
     if inizio == None:
         inizio = fine - timedelta(days=30)
     conn = sqlite3.connect("entrate.db")
-    inizio = adapt_datetime(inizio)
-    fine = adapt_datetime(fine)
+    if type(inizio) == datetime:
+        inizio = adapt_datetime(inizio)
+    if type(fine) == datetime:
+        fine = adapt_datetime(fine)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -238,6 +240,33 @@ def add_spesa_cc(utente,importo,descrizione = '',data = datetime.now(), mensilit
                     """, (utente, "Addebito carta di credito", round(importo/mensilita,2), ts_addebito))
     conn.commit()
     conn.close()
+
+def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None):
+    out = []
+    
+    if inizio == None:
+        inizio = fine - timedelta(days=30)
+    conn = sqlite3.connect("spese_cc.db")
+    if type(inizio) == datetime:
+        inizio = adapt_datetime(inizio)
+    if type(fine) == datetime:
+        fine = adapt_datetime(fine)
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+                   SELECT * FROM spese_cc WHERE data BETWEEN ? AND ? AND utente = ?
+                   """, (inizio,fine,utente_id))
+    
+    risultati = cursor.fetchall()
+    totale = 0
+    for riga in risultati:
+        spesa = spesa.SpesaCc(riga[3],riga[2],riga[4],riga[4])
+        out.append(spesa)
+        totale += spesa.importo
+    spesa = spese.SpesaCc(totale, "Totale", fine,0)
+    out.append(spesa)
+    return out
+
     
 def get_saldo(utente):
     fine = datetime.now()
