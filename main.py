@@ -320,7 +320,7 @@ def main():
     # Aggiungi il gestore per il comando /start
     application.add_handler(CommandHandler("start", crea_utente))
     getSpesa = ConversationHandler( 
-        entry_points=[CommandHandler('getSpese', get_spesa)],
+        entry_points=[CommandHandler('getspese', get_spesa)],
             states=
                 {STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_spesa_secondo_stato)],
                     STATO2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_spesa_terzo_stato)],
@@ -329,7 +329,7 @@ def main():
                 fallbacks=[CommandHandler('annulla', cancel)],
                 )
     getEntrate = ConversationHandler( 
-        entry_points=[CommandHandler('getEntrate', get_entrate)],
+        entry_points=[CommandHandler('getentrate', get_entrate)],
             states=
                 {STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_entrate_secondo_stato)],
                     STATO2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_entrate_terzo_stato)],
@@ -338,7 +338,7 @@ def main():
                 fallbacks=[CommandHandler('annulla', cancel)],
                 )
     addSpesa = ConversationHandler( 
-        entry_points=[CommandHandler('addSpesa', add_spesa)],
+        entry_points=[CommandHandler('addspesa', add_spesa)],
             states=
                 {STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_spesa_state2)],
                     STATO2: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_spesa_state3)],
@@ -347,7 +347,7 @@ def main():
                 )
     
     addEntrata = ConversationHandler( 
-        entry_points=[CommandHandler('addEntrata', add_entrata)],
+        entry_points=[CommandHandler('addentrata', add_entrata)],
             states=
                 {STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_entrata_state2)],
                     STATO2: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_entrata_state3)],
@@ -356,7 +356,7 @@ def main():
                 )
     
     addSpesaCc = ConversationHandler( 
-    entry_points=[CommandHandler('addSpesaCc', add_spesa_cc)],
+    entry_points=[CommandHandler('addspesacc', add_spesa_cc)],
         states=
             {STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_spesa_cc_state2)],
                 STATO2: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_spesa_cc_state3)],
@@ -371,19 +371,8 @@ def main():
     application.add_handler(getSpesa)
     application.add_handler(addEntrata)
     application.add_handler(addSpesaCc)
-    application.add_handler(CommandHandler("getSaldo", get_saldo))
-    """    
-    application.add_handler(CommandHandler("saldo", saldoMensileCurr))
-    application.add_handler(CommandHandler("speseVarie", spese))
-    application.add_handler(CommandHandler("addebitoCc", addebitoCc))
-    application.add_handler(CommandHandler("sommaSpese", saldoSommaSpese))
-    application.add_handler(CommandHandler("add", entrate))
-    application.add_handler(CommandHandler("addSpesa", addSpesaVaria))
-    application.add_handler(CommandHandler("addSpesaCc", addSpesaCc))
-    application.add_handler(CommandHandler("report", report))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("download", send_excel))
-    application.add_handler(CommandHandler("addStipendio", add_stipendio))"""
+    application.add_handler(CommandHandler("getsaldo", get_saldo))
+
     # Avvia il bot
     application.run_polling()
 
