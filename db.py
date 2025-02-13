@@ -75,7 +75,7 @@ def create (utente):
     try:
         cursor.execute("""INSERT INTO utenti (utente) VALUES (?)""",(utente,))
     except sqlite3.IntegrityError as e:
-        print(f"{e}\nUtente già esistente")
+        raise errors.CreateUserError(f"Utente {utente} già esistente")
     conn.commit()
     conn.close()
 
@@ -147,8 +147,10 @@ def get_spesa(utente_id, fine=datetime.now(),inizio=None):
     if inizio == None:
         inizio = fine - timedelta(days=30)
     conn = sqlite3.connect("spese.db")
-    inizio = adapt_datetime(inizio)
-    fine = adapt_datetime(fine)
+    if type(inizio) == datetime:
+        inizio = adapt_datetime(inizio)
+    if type(fine) == datetime:
+        fine = adapt_datetime(fine)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -160,8 +162,9 @@ def get_spesa(utente_id, fine=datetime.now(),inizio=None):
     for riga in risultati:
         spesa = spese.Spesa(riga[3],riga[2],riga[4])
         out.append(spesa)
-        totale += spesa[3]
+        totale += spesa.importo
     spesa = spese.Spesa(totale, "Totale", fine)
+    out.append(spesa)
     return out
 
 def get_entrata(utente_id, fine=datetime.now(),inizio=None):
@@ -271,10 +274,3 @@ def get_saldo(utente):
     conn.close()
     return totale_entrate - totale_spese
 
-  
-init_db()       
-create("Faciolo")
-salva_entrata("Faciolo","Stipendio", 1300, "2025/02/13 14:59:00")
-add_spesa_cc("Faciolo",1000,"tv","2025/02/13 14:59:00",6)
-add_spesa_cc("Faciolo",100, "cena")
-print(get_saldo("Faciolo"))
