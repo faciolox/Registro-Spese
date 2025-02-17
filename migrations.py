@@ -8,3 +8,4 @@ cursor.execute("""
                """)
 conn.commit()
 conn.close()
+print("Column added successfully")
