@@ -236,9 +236,11 @@ def add_spesa_cc(utente,importo,descrizione = '',data = datetime.now(), mensilit
     conn.commit()
     conn.close()
 
-def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None):
+from typing import List
+
+def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None) -> List[spese.SpesaCc]:
     out = []
-    
+    spesa = spese.SpesaCc
     if inizio == None:
         inizio = fine - timedelta(days=30)
     conn = sqlite3.connect("spese_cc.db")
@@ -255,7 +257,7 @@ def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None):
     risultati = cursor.fetchall()
     totale = 0
     for riga in risultati:
-        spesa = spesa.SpesaCc(riga[3],riga[2],riga[4],riga[4])
+        spesa = spese.SpesaCc(riga[3],riga[2],riga[4],riga[5])
         out.append(spesa)
         totale += spesa.importo
     spesa = spese.SpesaCc(totale, "Totale", fine,0)
