@@ -355,6 +355,9 @@ async def get_budget(update: Update, context: CallbackContext):
     try:
         utente = update.message.from_user.username
         budget = db.get_budget(utente)
+        if budget == None:
+            await update.message.reply_text("Budget non impostato, clicca su /setbudget per impostarlo")
+            return ConversationHandler.END
         await update.message.reply_text(f"Budget mensile: {budget} Euro")
         
         #calcolo budget mensile

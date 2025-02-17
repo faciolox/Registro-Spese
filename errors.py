@@ -5,3 +5,7 @@ class DescriptionError(Exception):
 class CreateUserError(Exception):
     def __init__(self, messaggio):
         super().__init__(messaggio)
+        
+class BudgetNotFound(Exception):
+    def __init__(self, messaggio):
+        super().__init__(messaggio)
