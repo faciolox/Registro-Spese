@@ -267,7 +267,7 @@ async def get_saldo(update: Update, context: CallbackContext):
     try:
         utente = update.message.from_user.username
         saldo = db.get_saldo(utente)
-        await update.message.reply_text(f"Saldo il prossimo 8 del mese: {saldo} Euro")
+        await update.message.reply_text(f"Saldo il prossimo 8 del mese: {round(saldo,2)} Euro")
         print(f"{datetime.now(TZ)} | {update.message.from_user.username} | 200: Saldo trovato")
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova {e}")
