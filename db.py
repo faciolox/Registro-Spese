@@ -79,10 +79,6 @@ def create (utente):
     conn.commit()
     conn.close()
 
-
-
-
-
 def adapt_datetime(dt):
     return dt.strftime("%Y/%m/%d %H:%M:%S")
  
@@ -113,7 +109,6 @@ def trasferisci_json(file = 'Registri/registri.json'):
     conn2.commit()
     conn.close()
     conn2.close()
-
 
 def salva_spesa(utente_id, descrizione, importo, data):
     if descrizione == "Addebito carta di credito":
@@ -266,7 +261,6 @@ def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None):
     spesa = spese.SpesaCc(totale, "Totale", fine,0)
     out.append(spesa)
     return out
-
     
 def get_saldo(utente):
     fine = datetime.now()
@@ -302,4 +296,29 @@ def get_saldo(utente):
         totale_entrate += entrata[3]
     conn.close()
     return totale_entrate - totale_spese
+
+def set_budget(utente, budget):
+    conn = sqlite3.connect("utente.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   UPDATE utenti SET budget = ? WHERE utente = ?
+                   """, (budget, utente))
+    conn.commit()
+    conn.close()
+    
+def get_budget(utente):
+    conn = sqlite3.connect("utente.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT budget FROM utenti WHERE utente = ?
+                   """, (utente,))
+    risultato = cursor.fetchone()
+    conn.close()
+    if risultato == None:
+        return None
+    else:
+        return risultato[0]
+
+    
+    
 
