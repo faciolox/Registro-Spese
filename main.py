@@ -122,7 +122,10 @@ async def add_spesa(update: Update, context: CallbackContext):
 async def add_spesa_state2(update: Update, context: CallbackContext):
     try:
         context.user_data['descrizione'] = update.message.text
-        await update.message.reply_text("Inserisci l'importo della spesa")
+        await get_budget(update, context)
+        await update.message.reply_text("Inserisci l'importo della spesa") 
+        
+
         return STATO2
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova \n{e}") 
@@ -132,6 +135,7 @@ async def add_spesa_state3(update: Update, context: CallbackContext):
         context.user_data['importo'] = update.message.text
         db.salva_spesa(update.message.from_user.username, context.user_data['descrizione'], context.user_data['importo'], ts)
         await update.message.reply_text("Spesa salvata")
+        await get_budget(update, context)
         return ConversationHandler.END
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova \n{e}")
@@ -253,7 +257,30 @@ async def add_spesa_cc(update: Update, context: CallbackContext):
         await update.message.reply_text(f"Errore, riprova \n{e}")
 async def add_spesa_cc_state2(update: Update, context: CallbackContext):
     try:
+        utente = update.message.from_user.username
+        budget = db.get_budget(utente)
         context.user_data['descrizione'] = update.message.text
+        if update.message.date.day < 8:
+            if update.message.date.month == 1:
+                inizio = datetime(update.message.date.year-1, 12, 8,0,0,0)
+                fine =datetime(update.message.date.year, 1, 8,0,0,0)
+            else:
+                inizio = datetime(update.message.date.year, update.message.date.month-1, 8,0,0,0)
+                fine = datetime(update.message.date.year, update.message.date.month, 8,0,0,0)
+        else:
+            if update.message.date.month == 12:
+                inizio = datetime(update.message.date.year,12,8,0,0,0)
+                fine = datetime(update.message.date.year+1, 1, 8,0,0,0)
+            else:
+                inizio = datetime(update.message.date.year, update.message.date.month, 8,0,0,0)
+                fine = datetime(update.message.date.year, update.message.date.month+1, 8,0,0,0)
+        spese_mensili = db.get_spesa(utente, fine, inizio)
+        totale = spese_mensili[-1]
+        if totale.importo > budget:
+            await update.message.reply_text(f"ATTENZIONE! Hai superato il budget mensile di {totale.importo - budget} Euro")
+        else:
+            await update.message.reply_text(f"A fronte di una spesa di {round(totale.importo,2)} Euro, questo mese puoi spendere ancora {round(budget-totale.importo, 2)} Euro")
+        
         await update.message.reply_text("Inserisci l'importo della spesa")
         return STATO2
     except Exception as e:
@@ -277,6 +304,7 @@ async def add_spesa_cc_state4(update: Update, context: CallbackContext):
         else:
             db.add_spesa_cc(update.message.from_user.username, float(context.user_data['importo']), context.user_data['descrizione'], datetime.now().strftime("%Y/%m/%d %H:%M:%S"), 1)
             await update.message.reply_text("Spesa salvata")
+            await get_budget(update, context)
             return ConversationHandler.END
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova \n{e}")    
@@ -289,6 +317,7 @@ async def add_spesa_cc_state5(update: Update, context: CallbackContext):
             return STATO4
         db.add_spesa_cc(update.message.from_user.username, float(context.user_data['importo']), context.user_data['descrizione'],  datetime.now().strftime("%Y/%m/%d %H:%M:%S"), rate)
         await update.message.reply_text("Spesa salvata")
+        await get_budget(update, context)
         return ConversationHandler.END
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova \n{e}")   
@@ -348,7 +377,7 @@ async def get_budget(update: Update, context: CallbackContext):
         if totale.importo > budget:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget mensile di {totale.importo - budget} Euro")
         else:
-            await update.message.reply_text(f"A fronte di una spesa di {totale} Euro, questo mese puoi spendere ancora {budget-totale.importo} Euro")
+            await update.message.reply_text(f"A fronte di una spesa di {round(totale.importo,2)} Euro, questo mese puoi spendere ancora {round(budget-totale.importo, 2)} Euro")
         
         #calcolo budget settimanale
         inizio_oggi = datetime(update.message.date.year, update.message.date.month, update.message.date.day,0,0,0)
@@ -361,7 +390,7 @@ async def get_budget(update: Update, context: CallbackContext):
         if spesa_settimanale[-1].importo > budget_settimanale:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget settimanale di {spesa_settimanale[-1].importo - budget_settimanale} Euro")
         else:
-            await update.message.reply_text(f"A fronte di una spesa di {spesa_settimanale[-1].importo} Euro, questa settimana puoi spendere ancora {budget_settimanale-spesa_settimanale[-1].importo} Euro")
+            await update.message.reply_text(f"A fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {round(budget_settimanale-spesa_settimanale[-1].importo, 2)} Euro")
         
 
         
@@ -372,7 +401,7 @@ async def get_budget(update: Update, context: CallbackContext):
         if spesa_giornaliera[-1].importo > budget_giornaliero:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget giornaliero di {spesa_giornaliera[-1].importo - budget_giornaliero} Euro")
         else:
-            await update.message.reply_text(f"A fronte di una spesa di {spesa_giornaliera[-1].importo} Euro, oggi puoi spendere ancora {budget_giornaliero-spesa_giornaliera[-1].importo} Euro")
+            await update.message.reply_text(f"A fronte di una spesa di {round(spesa_giornaliera[-1].importo,2)} Euro, oggi puoi spendere ancora {round(budget_giornaliero-spesa_giornaliera[-1].importo,2)} Euro")
             
         
         
@@ -446,6 +475,7 @@ def main():
         fallbacks=[CommandHandler('annulla', cancel)],
     )
     
+    application.add_handler(CommandHandler("getbudget",get_budget))
     application.add_handler(setBudget)
     application.add_handler(getEntrate)
     application.add_handler(addSpesa)
