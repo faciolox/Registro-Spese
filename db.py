@@ -2,7 +2,14 @@ from datetime import datetime, timedelta
 import sqlite3
 import json
 import spese, entrate, errors
-def init_db():
+def init_db() -> None:
+    """
+    Inizializza il database creando le tabelle se non esistono
+    Crea tabella utente, spese, entrate, spese_cc
+    
+    Returns:
+        None: La funziona ritorna nulla
+    """
     
     conn = sqlite3.connect("utente.db")
     cursor = conn.cursor()
@@ -69,7 +76,19 @@ def init_db():
     conn.commit()
     conn.close()
     
-def create (utente):
+def create (utente:str) -> None:
+    """
+    Crea un utente nel database
+    
+    Args:
+        utente (str): Nome dell'utente da creare
+    
+    Returns:
+        None: La funzione ritorna nulla
+    
+    Raises:
+        errors.CreateUserError: Se l'utente è già presente nel database
+    """
     conn = sqlite3.connect("utente.db")
     cursor = conn.cursor()
     try:
@@ -79,13 +98,39 @@ def create (utente):
     conn.commit()
     conn.close()
 
-def adapt_datetime(dt):
+def adapt_datetime(dt:datetime) -> str:
+    """
+    Adatta la data per il database
+    
+    Args:
+        dt (datetime): Data da adattare
+        
+    Returns:
+        str: La data adattata per il database
+    """
     return dt.strftime("%Y/%m/%d %H:%M:%S")
  
-def convert_datetime(dt):
+def convert_datetime(dt:str) -> datetime:
+    """
+    Converte la data dal database
+
+    Args:
+        dt (str): Data da convertire
+
+    Returns:
+        datetime: La data convertita
+    """
     return datetime.strptime(dt,"%Y/%m/%d %H:%M:%S")
  
-def trasferisci_json(file = 'Registri/registri.json'):
+def trasferisci_json(file: str = 'Registri/registri.json') -> None:
+    """
+    [DEPRECATO] Trasferisce i dati dal file json al database
+    
+    Args:
+        file (str): File json da cui trasferire i dati
+    
+    Returns:
+        None: La funzione ritorna nulla"""
     with open(file, 'r') as f:
         json_reg = json.load(f)
     conn = sqlite3.connect("spese.db")
@@ -110,7 +155,22 @@ def trasferisci_json(file = 'Registri/registri.json'):
     conn.close()
     conn2.close()
 
-def salva_spesa(utente_id, descrizione, importo, data):
+def salva_spesa(utente_id: str, descrizione:str, importo:int, data:datetime) -> None:
+    """
+    Salva una spesa nel database
+    
+    Args:
+        utente_id (str): ID dell'utente
+        descrizione (str): Descrizione della spesa
+        importo (int): Importo della spesa
+        data (datetime): Data della spesa
+    
+    Returns:
+        None: La funzione ritorna nulla
+        
+    Raises:
+        errors.DescriptionError: Se la descrizione è "Addebito carta di credito"
+    """
     if descrizione == "Addebito carta di credito":
         raise errors.DescriptionError("Descrizione non valida, utilizzare la funzione apposita per la carta di credito")
     conn = sqlite3.connect("spese.db")
@@ -123,10 +183,21 @@ def salva_spesa(utente_id, descrizione, importo, data):
     conn.commit()
     conn.close()
  
-def salva_entrata(utente_id, descrizione, importo, data):
+def salva_entrata(utente_id:str, descrizione:str, importo:int, data:datetime) -> None:
+    """
+    Salva un'entrata nel database
+    
+    Args:
+        utente_id (str): ID dell'utente
+        descrizione (str): Descrizione dell'entrata
+        importo (int): Importo dell'entrata
+        data (datetime): Data dell'entrata
+        
+    Returns:
+        None: La funzione ritorna nulla
+    """
     conn = sqlite3.connect("entrate.db")
     cursor = conn.cursor()
-    ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
     ts = ts.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
                     INSERT INTO entrate (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
