@@ -384,8 +384,7 @@ async def set_budget(update: Update, context: CallbackContext):
         return STATO1
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova \n{e}")
-        print (f"{datetime.now(TZ)} | {update.message.from_user.username} | 500: Errore {e}")
-        
+        print (f"{datetime.now(TZ)} | {update.message.from_user.username} | 500: Errore {e}")       
 async def set_budget_state2(update: Update, context: CallbackContext):
     try:
         budget = update.message.text
@@ -423,30 +422,33 @@ async def get_budget(update: Update, context: CallbackContext):
                 fine = datetime(datetime.now(TZ).year, datetime.now(TZ).month+1, 8,0,0,0)
         spese_mensili = db.get_spesa(utente, fine, inizio)
         totale = spese_mensili[-1]
+        budget_rimanente = round(budget - totale.importo,2)
         if totale.importo > budget:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget mensile di {totale.importo - budget} Euro")
         else:
             await update.message.reply_text(f"A fronte di una spesa di {round(totale.importo,2)} Euro, questo mese puoi spendere ancora {round(budget-totale.importo, 2)} Euro")
         
         #calcolo budget settimanale
+        delta_days = datetime.now(TZ) - fine
+        settimane_rimanenti = math.ceil(delta_days.days/7)
+        budget_settimanale_rimanente = round(budget_rimanente/settimane_rimanenti,2)
         inizio_oggi = datetime(datetime.now(TZ).year, datetime.now(TZ).month, datetime.now(TZ).day,0,0,0)
         weekday = datetime.now(TZ).weekday()
         delta_fine = 7-weekday
         inizio_settimana = inizio_oggi - timedelta(days=weekday)
         fine_settimana = inizio_oggi + timedelta(days=delta_fine)
         spesa_settimanale = db.get_spesa(utente, fine_settimana, inizio_settimana)
-        budget_settimanale = budget/4
-        if spesa_settimanale[-1].importo > budget_settimanale:
-            await update.message.reply_text(f"ATTENZIONE! Hai superato il budget settimanale di {spesa_settimanale[-1].importo - budget_settimanale} Euro")
+        if spesa_settimanale[-1].importo > budget_settimanale_rimanente:
+            await update.message.reply_text(f"ATTENZIONE! Hai superato il budget settimanale di {budget_settimanale_rimanente} Euro")
         else:
-            await update.message.reply_text(f"A fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {round(budget_settimanale-spesa_settimanale[-1].importo, 2)} Euro")
+            await update.message.reply_text(f"A fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {budget_settimanale_rimanente} Euro")
         
 
         
         #calcolo budget giornaliero
         domani = inizio_oggi + timedelta(days=1)
         spesa_giornaliera = db.get_spesa(utente, domani, inizio_oggi)
-        budget_giornaliero = budget/(fine-inizio).days
+        budget_giornaliero = budget_rimanente/(inizio_oggi - fine).days
         if spesa_giornaliera[-1].importo > budget_giornaliero:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget giornaliero di {spesa_giornaliera[-1].importo - budget_giornaliero} Euro")
         else:
