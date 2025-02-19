@@ -429,6 +429,8 @@ async def get_budget(update: Update, context: CallbackContext):
             await update.message.reply_text(f"A fronte di una spesa di {round(totale.importo,2)} Euro, questo mese puoi spendere ancora {round(budget-totale.importo, 2)} Euro")
         inizio = TZ.localize(inizio)
         fine = TZ.localize(fine)
+        
+        
         #calcolo budget settimanale
         delta_days = fine -  datetime.now(TZ)
         settimane_rimanenti = math.ceil(delta_days.days/7)
@@ -438,6 +440,7 @@ async def get_budget(update: Update, context: CallbackContext):
         weekday = datetime.now(TZ).weekday()
         delta_fine = 7-weekday
         inizio_settimana = inizio_oggi - timedelta(days=weekday)
+        budget_settimanale_rimanente = round((budget - db.get_spesa(inizio, inizio_settimana)[-1].importo ) / settimane_rimanenti,2)
         fine_settimana = inizio_oggi + timedelta(days=delta_fine)
         spesa_settimanale = db.get_spesa(utente, fine_settimana, inizio_settimana)
         if spesa_settimanale[-1].importo > budget_settimanale_rimanente:
@@ -450,9 +453,11 @@ async def get_budget(update: Update, context: CallbackContext):
         #calcolo budget giornaliero
         domani = inizio_oggi + timedelta(days=1)
         spesa_giornaliera = db.get_spesa(utente, domani, inizio_oggi)
-        budget_giornaliero = round(budget_rimanente/(fine - inizio_oggi).days,2)
+        spesa_precedente = db.get_spesa(utente, inizio_oggi, inizio)
+        giorni_rimanenti = (fine - inizio_oggi).days
+        budget_giornaliero = round((budget - spesa_precedente[-1].importo)/giorni_rimanenti,2)
         if spesa_giornaliera[-1].importo > budget_giornaliero:
-            await update.message.reply_text(f"ATTENZIONE! Hai superato il budget giornaliero di {spesa_giornaliera[-1].importo - budget_giornaliero} Euro. \n Il budget giornaliero è di {budget_giornaliero} Euro")
+            await update.message.reply_text(f"ATTENZIONE! Hai superato il budget giornaliero di {round(spesa_giornaliera[-1].importo - budget_giornaliero,2)} Euro. \n Il budget giornaliero è di {budget_giornaliero} Euro")
         else:
             await update.message.reply_text(f"A fronte di una spesa di {round(spesa_giornaliera[-1].importo,2)} Euro, oggi puoi spendere ancora {round(budget_giornaliero-spesa_giornaliera[-1].importo,2)} Euro")        
     except Exception as e:
