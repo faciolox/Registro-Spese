@@ -1,9 +1,11 @@
 from datetime import datetime
+import random
 
 
 class Spesa:
-    def __init__(self, importo:float , descrizione:str = None, timestamp: datetime = None ):
+    def __init__(self, importo:float , descrizione:str = None, timestamp: datetime = None, id : int = random.randint(0,1000000) ):
         self.importo = importo
+        self.id = id
         if not(descrizione):
             self.descrizione = ''
         else:
@@ -36,7 +38,7 @@ class Spesa:
         return {"Orario": self.timestamp, "Descrizione": self.descrizione, "Importo": self.importo}
 
 class SpesaCc(Spesa):
-    def __init__(self, importo:float, descrizione:str = None, timestamp:datetime = None, mensilità:int = 1):
+    def __init__(self, importo:float, descrizione:str = None, timestamp:datetime = None, mensilità:int = 1, id : int = random.randint(0,10000000)):
         super().__init__(importo, descrizione, timestamp)
         self.mensilità = mensilità
 

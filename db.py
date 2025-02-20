@@ -176,7 +176,8 @@ def salva_spesa(utente_id: str, descrizione:str, importo:float, data:datetime) -
         raise errors.DescriptionError("Descrizione non valida, utilizzare la funzione apposita per la carta di credito")
     conn = sqlite3.connect("spese.db")
     cursor = conn.cursor()
-    ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
+    if type(data) == str:
+        ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
     ts = ts.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
                     INSERT INTO spese (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
@@ -366,7 +367,7 @@ def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None) -> List[spese.Spesa
     risultati = cursor.fetchall()
     totale = 0
     for riga in risultati:
-        spesa = spese.SpesaCc(riga[3],riga[2],riga[4],riga[5])
+        spesa = spese.SpesaCc(riga[3],riga[2],riga[4],riga[5],riga[0])
         out.append(spesa)
         totale += spesa.importo
     spesa = spese.SpesaCc(totale, "Totale", fine,0)
@@ -485,8 +486,202 @@ def get_addebito(utente:str, mese: int) -> spese.Spesa:
     if risultato == None:
         raise errors.NoAddebitoError("Nessun addebito trovato")
     else:
-        return spese.Spesa(risultato[3], risultato[2], risultato[4])
+        return spese.Spesa(risultato[3], risultato[2], risultato[4], risultato[0])
         
+def delete_budget(utente:str) -> None:
+    """
+    Elimina il budget dell'utente
     
+    Args:
+        utente (str): ID dell'utente
+        
+    Returns:
+        None: La funzione ritorna nulla
+    """
+    conn = sqlite3.connect("utente.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   UPDATE utenti SET budget = NULL WHERE utente = ?
+                   """, (utente,))
+    conn.commit()
+    conn.close()
     
+def delete_spesa(utente:str, id_spesa:int) -> None:
+    """
+    Elimina una spesa
+    
+    Args:
+        utente (str): ID dell'utente
+        id_spesa (int): ID della spesa
+        
+    Returns:
+        None: La funzione ritorna nulla
+    
+    Raises:
+        errors.DeleteError: Se si verifica un errore durante l'eliminazione della spesa
+    """
+    conn = sqlite3.connect("spese.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+                    DELETE FROM spese WHERE utente = ? AND id_spesa = ?
+                    """, (utente,id_spesa))
+        conn.commit()
+        conn.close()
+    except sqlite3.IntegrityError as e:
+        raise errors.DeleteError(f"Errore durante l'eliminazione della spesa {id_spesa}")
 
+def delete_entrata(utente:str, id_entrata: int) -> None:
+    """
+    Elimina un'entrata
+    
+    Args:
+        utente (str): ID dell'utente
+        id_entrata (int): ID dell'entrata
+        
+    Returns:
+        None: La funzione ritorna nulla
+    
+    Raises:
+        errors.DeleteError: Se si verifica un errore durante l'eliminazione dell'entrata
+    """
+    conn = sqlite3.connect("entrate.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+                    DELETE FROM entrate WHERE utente = ? AND id_entrata = ?
+                    """, (utente,id_entrata))
+        conn.commit()
+        conn.close()
+    except sqlite3.IntegrityError as e:
+        raise errors.DeleteError(f"Errore durante l'eliminazione dell'entrata {id_entrata}")
+def get_spesa_with_id(id_spesa:int) -> spese.Spesa:
+    """
+    Restituisce una spesa dato il suo ID
+    
+    Args:
+        id_spesa (int): ID della spesa
+        
+    Returns:
+        spese.Spesa: Spesa con l'ID specificato
+    """
+    conn = sqlite3.connect("spese.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT * FROM spese WHERE id_spesa = ?
+                   """, (id_spesa,))
+    risultato = cursor.fetchone()
+    conn.close()
+    return spese.Spesa(risultato[3], risultato[2], risultato[4], risultato[0])
+  
+def modifica_spesa(utente:str, id_spesa:int, nuovo_importo: float) -> spese.Spesa:
+    """
+    Modifica l'importo di una spesa
+    
+    Args:
+        utente (str): ID dell'utente
+        id_spesa (int): ID della spesa
+        nuovo_importo (float): Nuovo importo della spesa
+    
+    Returns:
+        spese.Spesa: Spesa modificata
+    """
+    conn = sqlite3.connect("spese.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   UPDATE spese SET importo = ? WHERE utente = ? AND id_spesa = ?
+                   """, (nuovo_importo, utente, id_spesa))
+    conn.commit()
+    conn.close()
+    return get_spesa_with_id(id_spesa)
+
+def modifica_spesa_cc(utente:str, id_spesa:int, nuovo_importo: float) -> spese.SpesaCc:
+    """
+    Modifica l'importo di una spesa di carta di credito
+    
+    Args:
+        utente (str): ID dell'utente
+        id_spesa (int): ID della spesa
+        nuovo_importo (float): Nuovo importo della spesa
+    
+    Returns:
+        spese.SpesaCc: Spesa di carta di credito modificata
+    """
+    conn = sqlite3.connect("spese_cc.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   UPDATE spese_cc SET importo = ? WHERE utente = ? AND id_spesa = ?
+                   """, (nuovo_importo, utente, id_spesa))
+    conn.commit()
+    conn.close()
+    
+    spesa_cc = get_spesa_cc(id_spesa)
+    for i in range(1, spesa_cc.mensilità+1):
+        addebito = get_addebito(utente, (spesa_cc.timestamp.month+i)%12)
+        addebito.importo -= round(spesa_cc.importo/spesa_cc.mensilità,2)
+        if addebito < 0:
+            addebito = 0
+        addebito = modifica_spesa(utente, addebito.id, addebito.importo)
+    return spesa_cc  
+    
+def get_spesa_cc(id_spesa: int) -> spese.SpesaCc:
+    """
+    Restituisce una spesa di carta di credito dato il suo ID
+    
+    Args:
+        id_spesa (int): ID della spesa
+    
+    Returns:
+        spese.SpesaCc: Spesa di carta di credito con l'ID specificato
+    """  
+    conn = sqlite3.connect("spese_cc.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT * FROM spese_cc WHERE id_spesa = ?
+                   """, (id_spesa,))
+    risultato = cursor.fetchone()
+    conn.close()
+    return spese.SpesaCc(risultato[3], risultato[2], risultato[4], risultato[5], risultato[0])
+    
+def delete_spesa_cc(utente:str, id_spesa:int) -> None:
+    """
+    Elimina una spesa di carta di credito
+    
+    Args:
+        utente (str): ID dell'utente
+        id_spesa (int): ID della spesa
+        
+    Returns:
+        None: La funzione ritorna nulla
+    
+    Raises:
+        errors.DeleteError: Se si verifica un errore durante l'eliminazione della spesa
+    """
+    spesa_cc = get_spesa_cc(id_spesa)
+    for i in range(1, spesa_cc.mensilità+1):
+        addebito = get_addebito(utente, (spesa_cc.timestamp.month+i)%12)
+        addebito.importo -= round(spesa_cc.importo/spesa_cc.mensilità,2)
+        if addebito < 0:
+            addebito = 0
+        addebito = modifica_spesa(utente, addebito.id, addebito.importo)
+    conn = sqlite3.connect("spese_cc.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+                    DELETE FROM spese_cc WHERE utente = ? AND id_spesa = ?
+                    """, (utente,id_spesa))
+        conn.commit()
+        conn.close()
+    except sqlite3.IntegrityError as e:
+        raise errors.DeleteError(f"Errore durante l'eliminazione della spesa {id_spesa}")   
+ora = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+salva_spesa("test", "Test", 100, ora)
+add_spesa_cc("test", 100, "Test", ora, 3)
+salva_spesa("test", "Test2", 100, ora)
+modifica_spesa("test", 1, 200)
+modifica_spesa_cc("test", 1, 500)
+delete_spesa("test", 1)
+add_spesa_cc("test", 100, "Test3", ora, 3)
+delete_spesa_cc("test", 1)
+salva_entrata("test", "Test", 1000, ora)
+delete_entrata("test", 1)

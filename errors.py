@@ -15,3 +15,7 @@ class NoAddebitoError(Exception):
 class GenericError(Exception):
     def __init__(self, messaggio):
         super().__init__(messaggio)
+        
+class DeleteError(Exception):
+    def __init__(self, messaggio):
+        super().__init__(messaggio)

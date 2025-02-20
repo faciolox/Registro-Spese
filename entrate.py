@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
-
+import random
 import pytz
 
 rome_tz = pytz.timezone('Europe/Rome')
 
 class Entrate:
-    def __init__(self, importo: float, descrizione: str = None, timestamp:datetime = None ):
+    def __init__(self, importo: float, descrizione: str = None, timestamp:datetime = None, id:int = random.randint(0, 1000000)):
+        self.id = id
         self.importo = importo
         if not(descrizione):
             self.descrizione = ''
