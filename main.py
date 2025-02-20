@@ -63,8 +63,8 @@ async def get_spesa_secondo_stato(update: Update, context: CallbackContext):
             return STATO2
         else:
             out = ''
-            fine = datetime.now(TZ).strftime("%Y/%m/%d %H:%M:%S")
-            inizio = (datetime.now(TZ) - timedelta(days=30)).strftime("%Y/%m/%d %H:%M:%S")
+            fine = datetime.now(TZ)
+            inizio = (datetime.now(TZ) - timedelta(days=30))
             spese = db.get_spesa(utente, fine,inizio)
             if spese == []:
                 await update.message.reply_text("Nessuna spesa trovata")
@@ -96,11 +96,12 @@ async def get_spesa_terzo_stato(update: Update, context: CallbackContext):
 async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
     try:
         if update.message.text == 'x':
-            data = datetime.now(TZ).strftime("%Y/%m/%d %H:%M:%S")
+            data = datetime.now(TZ)
         else:
             try:
+                
                 giorno, mese, anno = update.message.text.split("/")
-                data = f"{anno}/{mese}/{giorno} 00:00:00"
+                data = datetime(int(anno), int(mese), int(giorno),0,0,0)
             except:
                 await update.message.reply_text("Formato non valido, riprova")
                 return STATO3
@@ -140,7 +141,7 @@ async def add_spesa_state2(update: Update, context: CallbackContext):
         print (f"{datetime.now(TZ)} | {update.message.from_user.username} | 500: Errore {e}")
 async def add_spesa_state3(update: Update, context: CallbackContext):
     try:
-        ts = datetime.now(TZ).strftime("%Y/%m/%d %H:%M:%S")
+        ts = datetime.now(TZ)
         context.user_data['importo'] = update.message.text
         db.salva_spesa(update.message.from_user.username, context.user_data['descrizione'], context.user_data['importo'], ts)
         await update.message.reply_text("Spesa salvata")
@@ -169,15 +170,15 @@ async def add_entrata_state2(update: Update, context: CallbackContext):
         print (f"{datetime.now(TZ)} | {update.message.from_user.username} | 500: Errore {e}")
 async def add_entrata_state3(update: Update, context: CallbackContext):
     try:
-        ts = datetime.now(TZ).strftime("%Y/%m/%d %H:%M:%S")
+        ts = datetime.now(TZ)
         context.user_data['importo'] = update.message.text
         db.salva_entrata(update.message.from_user.username, context.user_data['descrizione'], context.user_data['importo'], ts)
         await update.message.reply_text("Entrata salvata")
-        print(f"{datetime.now(TZ)} | {update.message.from_user.username} | 200: Entrata salvata")
+        print(f"{ts} | {update.message.from_user.username} | 200: Entrata salvata")
         return ConversationHandler.END
     except Exception as e: 
         await update.message.reply_text(f"Errore, riprova \n{e}")
-        print (f"{datetime.now(TZ)} | {update.message.from_user.username} | 500: Errore {e}")
+        print (f"{ts} | {update.message.from_user.username} | 500: Errore {e}")
 
 async def get_entrate(update: Update, context: CallbackContext):
     try:
