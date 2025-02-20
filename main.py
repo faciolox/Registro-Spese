@@ -158,6 +158,7 @@ async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
             out += f"{spesa_cc.descrizione} | {spesa_cc.timestamp} | Importo: {spesa_cc.importo}€ | Mensilità: {spesa_cc.mensilità} | Rata: {round(spesa_cc.importo/spesa_cc.mensilità,2)}\n"
             totale.importo += spesa_cc.importo
         out += f"Totale spese: {totale.importo}€"
+        logger.info(out)
         await update.message.reply_text(f"Spese:\n {out}")
         logger.info(f"{update.message.from_user.username} | 200: Spese trovate")
         return ConversationHandler.END
