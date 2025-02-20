@@ -19,4 +19,4 @@ giorno in cui arriva l'accredito dello stipendio.
 * pip install python-telegram-bot
 * pip install openpyxl
 * pip install sqlite3
-
+* pip install colorlog
