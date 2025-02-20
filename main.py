@@ -107,8 +107,8 @@ async def get_spesa_secondo_stato(update: Update, context: CallbackContext):
                     totale = spesa
                     if spese_cc != None:
                         totale.importo += spese_cc.importo
-                    
-                out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
+                else:   
+                    out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
             out += f"Totale spese: {totale.importo}€"
             await update.message.reply_text(f"Spese:\n {out}")
             logger.info(f"{update.message.from_user.username} | 200: Spese trovate")
