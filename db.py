@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import sqlite3
 import json
 import spese, entrate, errors
+from typing import List
 def init_db() -> None:
     """
     Inizializza il database creando le tabelle se non esistono
@@ -155,7 +156,7 @@ def trasferisci_json(file: str = 'Registri/registri.json') -> None:
     conn.close()
     conn2.close()
 
-def salva_spesa(utente_id: str, descrizione:str, importo:int, data:datetime) -> None:
+def salva_spesa(utente_id: str, descrizione:str, importo:float, data:datetime) -> None:
     """
     Salva una spesa nel database
     
@@ -183,7 +184,7 @@ def salva_spesa(utente_id: str, descrizione:str, importo:int, data:datetime) -> 
     conn.commit()
     conn.close()
  
-def salva_entrata(utente_id:str, descrizione:str, importo:int, data:datetime) -> None:
+def salva_entrata(utente_id:str, descrizione:str, importo:float, data:datetime) -> None:
     """
     Salva un'entrata nel database
     
@@ -205,7 +206,19 @@ def salva_entrata(utente_id:str, descrizione:str, importo:int, data:datetime) ->
     conn.commit()
     conn.close()
     
-def get_spesa(utente_id, fine=datetime.now(),inizio=None):
+def get_spesa(utente_id: str, fine :datetime = datetime.now(),inizio :datetime =None) -> list[spese.Spesa]:
+    """
+    Restituisce le spese di un utente
+    
+    Args:
+        utente_id (str): ID dell'utente
+        fine (datetime): Data di fine
+        inizio (datetime): Data di inizio
+        
+    Returns:
+        list[spese.Spesa]: Lista delle spese dell'utente
+    """
+    
     sqlite3.register_adapter(datetime,adapt_datetime)
     sqlite3.register_converter("datetime",convert_datetime)
     
@@ -233,7 +246,20 @@ def get_spesa(utente_id, fine=datetime.now(),inizio=None):
     out.append(spesa)
     return out
 
-def get_entrata(utente_id, fine=datetime.now(),inizio=None):
+def get_entrata(utente_id: str, fine: datetime =datetime.now(),inizio: datetime=None) -> list[entrate.Entrate]:
+    """
+    Data un inizio e una fine restituisce le entrate di un utente
+    
+    Args:
+        utente_id (str): ID dell'utente
+        fine (datetime): Data di fine
+        inizio (datetime): Data di inizio
+        
+    Returns:
+        list[entrate.Entrate]: Lista delle entrate dell'utente
+    """
+    
+    
     out = []
     
     if inizio == None:
@@ -259,7 +285,20 @@ def get_entrata(utente_id, fine=datetime.now(),inizio=None):
     out.append(spesa)
     return out
 
-def add_spesa_cc(utente,importo,descrizione = '',data = datetime.now(), mensilita=1 ):
+def add_spesa_cc(utente: str,importo:float ,descrizione:str = '',data:datetime = datetime.now(), mensilita:int=1 ) -> None:
+    """
+    Aggiunge una spesa di tipo carta di credito e aggiunge le varie rate agli addebiti del relativo mese
+    
+    Args:
+        utente (str): ID dell'utente
+        importo (float): Importo della spesa
+        descrizione (str): Descrizione della spesa
+        data (datetime): Data della spesa
+        mensilita (int): Numero di rate
+    
+    Returns:
+        None: La funzione ritorna nulla
+    """
     conn = sqlite3.connect("spese_cc.db")
     cursor = conn.cursor()
     if type(data) == str:
@@ -307,8 +346,6 @@ def add_spesa_cc(utente,importo,descrizione = '',data = datetime.now(), mensilit
     conn.commit()
     conn.close()
 
-from typing import List
-
 def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None) -> List[spese.SpesaCc]:
     out = []
     spesa = spese.SpesaCc
@@ -335,7 +372,17 @@ def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None) -> List[spese.Spesa
     out.append(spesa)
     return out
     
-def get_saldo(utente):
+def get_saldo(utente:str) -> float:
+    """
+    Restituisce il saldo dell'utente previsto il prossimo 8 del mese
+    
+    Args:
+        utente (str): ID dell'utente
+        
+    Returns:
+        float: Saldo dell'utente
+    """
+    
     fine = datetime.now()
     if fine.day >= 8:
         if fine.month == 12:
@@ -370,7 +417,18 @@ def get_saldo(utente):
     conn.close()
     return totale_entrate - totale_spese
 
-def set_budget(utente, budget):
+def set_budget(utente: str, budget: float) -> None:
+    """
+    Imposta il budget dell'utente
+    
+    Args:
+        utente (str): ID dell'utente
+        budget (float): Budget dell'utente
+        
+    Returns:
+        None: La funzione ritorna nulla
+    """
+    
     conn = sqlite3.connect("utente.db")
     cursor = conn.cursor()
     cursor.execute("""
@@ -379,7 +437,16 @@ def set_budget(utente, budget):
     conn.commit()
     conn.close()
     
-def get_budget(utente):
+def get_budget(utente:str) -> float:
+    """
+    Restituisce il budget dell'utente
+    
+    Args:
+        utente (str): ID dell'utente
+        
+    Returns:
+        float: Budget dell'utente
+    """
     conn = sqlite3.connect("utente.db")
     cursor = conn.cursor()
     cursor.execute("""
