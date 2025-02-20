@@ -149,10 +149,15 @@ async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
             await update.message.reply_text("Nessuna spesa trovata")
             return ConversationHandler.END
         for spesa in spese:
+            if spesa.descrizione == "Totale":
+                totale = spesa
+                break
             out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
         out += "Spese carta di credito:\n"
         for spesa_cc in spese_cc:
             out += f"{spesa_cc.descrizione} | {spesa_cc.timestamp} | Importo: {spesa_cc.importo}€ | Mensilità: {spesa_cc.mensilità} | Rata: {round(spesa_cc.importo/spesa_cc.mensilità,2)}\n"
+            totale.importo += spesa_cc.importo
+        out += f"Totale spese: {totale.importo}€"
         await update.message.reply_text(f"Spese:\n {out}")
         logger.info(f"{update.message.from_user.username} | 200: Spese trovate")
         return ConversationHandler.END
@@ -536,7 +541,7 @@ async def delete_spesa(update: Update, context: CallbackContext):
         spese = context.user_data['spese']
         contatore = 0
         while contatore < 5:
-            if context.user_data['contatore'] == len(spese) -1:
+            if context.user_data['contatore'] == len(spese):
                 break
             spesa = spese[context.user_data['contatore']]
             context.user_data['contatore'] += 1
@@ -544,7 +549,7 @@ async def delete_spesa(update: Update, context: CallbackContext):
             keyboard = [InlineKeyboardButton("Elimina🗑️", callback_data=f"deletespesa {spesa.id}")]
             reply_markup = InlineKeyboardMarkup([keyboard])
             await update.message.reply_text(f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€", reply_markup=reply_markup)
-        if context.user_data['contatore'] < len(spese)-1:
+        if context.user_data['contatore'] < len(spese):
             reply_keyboard = [["Vedi le prossime 5 spese"]]
            
             await update.message.reply_text("Vuoi vedere le prossime 5 spese?", reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
