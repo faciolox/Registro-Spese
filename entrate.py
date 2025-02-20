@@ -17,8 +17,7 @@ class Entrate:
         elif type(timestamp) == str:
             
             try:
-                datetime.strptime(timestamp, "%Y/%m/%d %H:%M:%S")
-                self.timestamp = timestamp
+                self.timestamp = datetime.strptime(timestamp, "%Y/%m/%d %H:%M:%S")
             except:
                 try:
                     data, orario = timestamp.split(" ")

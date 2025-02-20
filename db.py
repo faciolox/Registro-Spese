@@ -335,10 +335,10 @@ def add_spesa_cc(utente: str,importo:float ,descrizione:str = '',data:datetime =
             ts_addebito = datetime(ts_dt.year,ts_dt.month+i,4,23,59,59).strftime("%Y/%m/%d %H:%M:%S")
         for addebbiti_cc in risultati:
             if addebbiti_cc[4] == ts_addebito:
-                importo = round(addebbiti_cc[3] + (importo/mensilita),2)
+                importo_rata = round(addebbiti_cc[3] + (importo/mensilita),2)
                 cursor.execute("""
                     UPDATE spese SET importo = ? WHERE id_spesa = ?
-                    """,(importo ,addebbiti_cc[0]))
+                    """,(importo_rata ,addebbiti_cc[0]))
                 found = True
                 break
         if not found:
@@ -607,6 +607,8 @@ def modifica_spesa_cc(utente:str, id_spesa:int, nuovo_importo: float) -> spese.S
     Returns:
         spese.SpesaCc: Spesa di carta di credito modificata
     """
+    spesa_cc = get_spesa_cc(id_spesa,utente)
+    vecchio_importo = spesa_cc.importo
     conn = sqlite3.connect("spese_cc.db")
     cursor = conn.cursor()
     cursor.execute("""
@@ -614,35 +616,44 @@ def modifica_spesa_cc(utente:str, id_spesa:int, nuovo_importo: float) -> spese.S
                    """, (nuovo_importo, utente, id_spesa))
     conn.commit()
     conn.close()
+    spesa_cc.importo = nuovo_importo
+    differenza = vecchio_importo - nuovo_importo
     
-    spesa_cc = get_spesa_cc(id_spesa)
     for i in range(1, spesa_cc.mensilità+1):
         addebito = get_addebito(utente, (spesa_cc.timestamp.month+i)%12)
-        addebito.importo -= round(spesa_cc.importo/spesa_cc.mensilità,2)
-        if addebito < 0:
-            addebito = 0
+        addebito.importo = round( addebito.importo - (vecchio_importo/spesa_cc.mensilità) + (nuovo_importo/spesa_cc.mensilità),2)
+        if addebito.importo < 0:
+            addebito.importo = 0
         addebito = modifica_spesa(utente, addebito.id, addebito.importo)
     return spesa_cc  
     
-def get_spesa_cc(id_spesa: int) -> spese.SpesaCc:
+def get_spesa_cc(id_spesa: int, utente: str) -> spese.SpesaCc:
     """
     Restituisce una spesa di carta di credito dato il suo ID
     
     Args:
         id_spesa (int): ID della spesa
+        utente (str): ID dell'utente
     
     Returns:
         spese.SpesaCc: Spesa di carta di credito con l'ID specificato
+    
+    Raises:
+        errors.NoSpesaError: Se la spesa non è presente
     """  
     conn = sqlite3.connect("spese_cc.db")
     cursor = conn.cursor()
     cursor.execute("""
-                   SELECT * FROM spese_cc WHERE id_spesa = ?
-                   """, (id_spesa,))
+                    SELECT * FROM spese_cc WHERE id_spesa = ? AND utente = ?
+                    """, (id_spesa,utente))
     risultato = cursor.fetchone()
     conn.close()
-    return spese.SpesaCc(risultato[3], risultato[2], risultato[4], risultato[5], risultato[0])
-    
+    if risultato == None:
+        raise errors.NoSpesaError(f"Spesa {id_spesa} non trovata")
+    else:
+        return spese.SpesaCc(risultato[3], risultato[2], risultato[4], risultato[5], risultato[0])
+
+        
 def delete_spesa_cc(utente:str, id_spesa:int) -> None:
     """
     Elimina una spesa di carta di credito
@@ -656,32 +667,35 @@ def delete_spesa_cc(utente:str, id_spesa:int) -> None:
     
     Raises:
         errors.DeleteError: Se si verifica un errore durante l'eliminazione della spesa
+        errors.NoSpesaError: Se la spesa non è presente
     """
-    spesa_cc = get_spesa_cc(id_spesa)
-    for i in range(1, spesa_cc.mensilità+1):
-        addebito = get_addebito(utente, (spesa_cc.timestamp.month+i)%12)
-        addebito.importo -= round(spesa_cc.importo/spesa_cc.mensilità,2)
-        if addebito < 0:
-            addebito = 0
-        addebito = modifica_spesa(utente, addebito.id, addebito.importo)
-    conn = sqlite3.connect("spese_cc.db")
-    cursor = conn.cursor()
     try:
-        cursor.execute("""
-                    DELETE FROM spese_cc WHERE utente = ? AND id_spesa = ?
-                    """, (utente,id_spesa))
-        conn.commit()
-        conn.close()
-    except sqlite3.IntegrityError as e:
-        raise errors.DeleteError(f"Errore durante l'eliminazione della spesa {id_spesa}")   
+        spesa_cc = get_spesa_cc(id_spesa,utente)
+        for i in range(1, spesa_cc.mensilità+1):
+            addebito = get_addebito(utente, (spesa_cc.timestamp.month+i)%12)
+            addebito.importo -= round(spesa_cc.importo/spesa_cc.mensilità,2)
+            if addebito.importo < 0:
+                addebito.importo = 0
+            addebito = modifica_spesa(utente, addebito.id, addebito.importo)
+        conn = sqlite3.connect("spese_cc.db")
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                        DELETE FROM spese_cc WHERE utente = ? AND id_spesa = ?
+                        """, (utente,id_spesa))
+            conn.commit()
+            conn.close()
+        except sqlite3.IntegrityError as e:
+            raise errors.DeleteError(f"Errore durante l'eliminazione della spesa {id_spesa}")   
+    
+    except errors.NoSpesaError:
+        raise errors.NoSpesaError(f"Spesa {id_spesa} non trovata")
+
+
 ora = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-salva_spesa("test", "Test", 100, ora)
-add_spesa_cc("test", 100, "Test", ora, 3)
-salva_spesa("test", "Test2", 100, ora)
-modifica_spesa("test", 1, 200)
-modifica_spesa_cc("test", 1, 500)
-delete_spesa("test", 1)
-add_spesa_cc("test", 100, "Test3", ora, 3)
-delete_spesa_cc("test", 1)
-salva_entrata("test", "Test", 1000, ora)
-delete_entrata("test", 1)
+
+
+
+add_spesa_cc("test", 50, "Test2", ora, 5)
+modifica_spesa_cc("test", 8, 100)
+

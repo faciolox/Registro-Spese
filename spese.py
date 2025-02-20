@@ -16,8 +16,7 @@ class Spesa:
         elif type(timestamp) == str:
             
             try:
-                datetime.strptime(timestamp, "%Y/%m/%d %H:%M:%S")
-                self.timestamp = timestamp
+                self.timestamp = datetime.strptime(timestamp, "%Y/%m/%d %H:%M:%S")
             except:
                 try:
                     data, orario = timestamp.split(" ")
@@ -39,7 +38,7 @@ class Spesa:
 
 class SpesaCc(Spesa):
     def __init__(self, importo:float, descrizione:str = None, timestamp:datetime = None, mensilità:int = 1, id : int = random.randint(0,10000000)):
-        super().__init__(importo, descrizione, timestamp)
+        super().__init__(importo, descrizione, timestamp,id)
         self.mensilità = mensilità
 
     def to_dict(self) -> dict:

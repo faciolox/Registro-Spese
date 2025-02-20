@@ -19,3 +19,7 @@ class GenericError(Exception):
 class DeleteError(Exception):
     def __init__(self, messaggio):
         super().__init__(messaggio)
+
+class NoSpesaError(Exception):
+    def __init__(self, messaggio):
+        super().__init__(messaggio)
