@@ -103,8 +103,13 @@ async def get_spesa_secondo_stato(update: Update, context: CallbackContext):
                 await update.message.reply_text("Nessuna spesa trovata")
                 return ConversationHandler.END
             for spesa in spese:
+                if spesa.descrizione == "Totale":
+                    totale = spesa
+                    if spese_cc != None:
+                        totale.importo += spese_cc.importo
+                    break
                 out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
-            
+            out.append(f"Totale spese: {totale.importo}€")
             await update.message.reply_text(f"Spese:\n {out}")
             logger.info(f"{update.message.from_user.username} | 200: Spese trovate")
             return ConversationHandler.END
