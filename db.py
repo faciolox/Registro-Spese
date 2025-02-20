@@ -156,7 +156,7 @@ def trasferisci_json(file: str = 'Registri/registri.json') -> None:
     conn.close()
     conn2.close()
 
-def salva_spesa(utente_id: str, descrizione:str, importo:float, data:datetime) -> None:
+def salva_spesa(utente_id: str, descrizione:str, importo:float, ts:datetime) -> None:
     """
     Salva una spesa nel database
     
@@ -176,8 +176,8 @@ def salva_spesa(utente_id: str, descrizione:str, importo:float, data:datetime) -
         raise errors.DescriptionError("Descrizione non valida, utilizzare la funzione apposita per la carta di credito")
     conn = sqlite3.connect("spese.db")
     cursor = conn.cursor()
-    if type(data) == str:
-        ts = datetime.strptime(data,"%Y/%m/%d %H:%M:%S")
+    if type(ts) == str:
+        ts = datetime.strptime(ts,"%Y/%m/%d %H:%M:%S")
     ts = ts.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
                     INSERT INTO spese (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
@@ -240,7 +240,7 @@ def get_spesa(utente_id: str, fine :datetime = datetime.now(),inizio :datetime =
     risultati = cursor.fetchall()
     totale = 0
     for riga in risultati:
-        spesa = spese.Spesa(riga[3],riga[2],riga[4])
+        spesa = spese.Spesa(riga[3],riga[2],riga[4],riga[0])
         out.append(spesa)
         totale += spesa.importo
     spesa = spese.Spesa(totale, "Totale", fine)
@@ -696,6 +696,4 @@ ora = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 
 
-add_spesa_cc("test", 50, "Test2", ora, 5)
-modifica_spesa_cc("test", 8, 100)
 

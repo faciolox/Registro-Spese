@@ -9,7 +9,7 @@ from telegram import ReplyKeyboardMarkup
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, filters, MessageHandler, CommandHandler, CallbackContext, CallbackQueryHandler, ConversationHandler
-
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import entrate
 import errors
 from entrate import Entrate
@@ -516,7 +516,218 @@ async def get_budget(update: Update, context: CallbackContext):
                 await update.message.reply_text(f"A fronte di una spesa di {round(spesa_giornaliera[-1].importo,2)} Euro, oggi puoi spendere ancora {round(budget_giornaliero-spesa_giornaliera[-1].importo,2)} Euro")        
     except Exception as e:
         await update.message.reply_text(f"Errore, riprova {e}")
+
+
+async def delete_spesa(update: Update, context: CallbackContext):
+    try:
+        context.user_data['utente'] = update.message.from_user.username
+        spese = db.get_spesa(update.message.from_user.username,datetime.now(TZ), datetime(1900,1,1,0,0,0))
+        spese.sort(key=lambda x: x.timestamp, reverse=True)
+        context.user_data['spese'] = spese
+        
+        try:
+            if context.user_data['contatore'] == None:
+                context.user_data['contatore'] = 1
+                
+        except:
+            context.user_data['contatore'] = 1
+            await update.message.reply_text("Quali spese vuoi eliminare?")
+        
+        spese = context.user_data['spese']
+        contatore = 0
+        while contatore < 5:
+            if context.user_data['contatore'] == len(spese) -1:
+                break
+            spesa = spese[context.user_data['contatore']]
+            context.user_data['contatore'] += 1
+            contatore += 1
+            keyboard = [InlineKeyboardButton("Elimina🗑️", callback_data=f"deletespesa {spesa.id}")]
+            reply_markup = InlineKeyboardMarkup([keyboard])
+            await update.message.reply_text(f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€", reply_markup=reply_markup)
+        if context.user_data['contatore'] < len(spese)-1:
+            reply_keyboard = [["Vedi le prossime 5 spese"]]
+           
+            await update.message.reply_text("Vuoi vedere le prossime 5 spese?", reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+            return STATO1        
     
+    except Exception as e:
+        await update.message.reply_text(f"Errore, riprova {e}")
+async def delete_spesa_state2(update: Update, context: CallbackContext):
+    return ConversationHandler.END
+  
+async def delete_entrata(update: Update, context: CallbackContext):
+    try:
+        context.user_data['utente'] = update.message.from_user.username
+        entrate = db.get_entrata(update.message.from_user.username,datetime.now(TZ), datetime(1900,1,1,0,0,0))
+        entrate.sort(key=lambda x: x.timestamp, reverse=True)
+        context.user_data['entrate'] = entrate
+        
+        try:
+            if context.user_data['contatore'] == None:
+                context.user_data['contatore'] = 1
+                
+        except:
+            context.user_data['contatore'] = 1
+            await update.message.reply_text("Quali entrate vuoi eliminare?")
+        
+        entrate = context.user_data['entrate']
+        contatore = 0
+        while contatore < 5:
+            if context.user_data['contatore'] == len(entrate) -1:
+                break
+            entrata = entrate[context.user_data['contatore']]
+            context.user_data['contatore'] += 1
+            contatore += 1
+            keyboard = [InlineKeyboardButton("Elimina🗑️", callback_data=f"deleteentrata {entrata.id}")]
+            reply_markup = InlineKeyboardMarkup([keyboard])
+            await update.message.reply_text(f"{entrata.descrizione} | {entrata.timestamp} | Importo: {entrata.importo}€", reply_markup=reply_markup)
+        if context.user_data['contatore'] < len(entrate)-1:
+            reply_keyboard = [["Vedi le prossime 5 entrate"]]
+           
+            await update.message.reply_text("Vuoi vedere le prossime 5 entrate?", reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+            return STATO1        
+    
+    except Exception as e:
+        await update.message.reply_text(f"Errore, riprova {e}")
+
+async def edit_spesa(update: Update, context: CallbackContext):
+    try:
+        context.user_data['utente'] = update.message.from_user.username
+        spese = db.get_spesa(update.message.from_user.username,datetime.now(TZ), datetime(1900,1,1,0,0,0))
+        spese.sort(key=lambda x: x.timestamp, reverse=True)
+        context.user_data['spese'] = spese
+        
+        try:
+            if context.user_data['contatore'] == None:
+                context.user_data['contatore'] = 1
+                
+        except:
+            context.user_data['contatore'] = 1
+            await update.message.reply_text("Quali spese vuoi eliminare?")
+        
+        spese = context.user_data['spese']
+        contatore = 0
+        while contatore < 5:
+            if context.user_data['contatore'] == len(spese) -1:
+                break
+            spesa = spese[context.user_data['contatore']]
+            context.user_data['contatore'] += 1
+            contatore += 1
+            keyboard = [InlineKeyboardButton("Elimina🗑️", callback_data=f"editspesa {spesa.id}")]
+            reply_markup = InlineKeyboardMarkup([keyboard])
+            await update.message.reply_text(f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€", reply_markup=reply_markup)
+        if context.user_data['contatore'] < len(spese)-1:
+            reply_keyboard = [["Vedi le prossime 5 spese"]]
+           
+            await update.message.reply_text("Vuoi vedere le prossime 5 spese?", reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+            return STATO1 
+    except Exception as e:
+        await update.message.reply_text(f"Errore, riprova {e}")
+
+async def edit_spesa_state2(update: Update, context: CallbackContext):
+    try:
+        importo = update.message.text
+        spesa = db.modifica_spesa(context.user_data['utente'], context.user_data['spesa_id'], importo)      
+        await update.message.reply_text(f"Spesa modificata\n Descrizione: {spesa.descrizione} | Importo: {spesa.importo}€")
+        logger.info(f"{update.message.from_user.username} | 201: Spesa {context.user_data['spesa_id']} modificata")
+    except Exception as e:
+        await update.message.reply_text(f"Errore, riprova {e}")
+        logger.error(f"{update.message.from_user.username} | 500: Errore {e}")    
+
+async def button(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()  # Risponde alla callback per evitare il messaggio "pensieroso"
+    if query.data.startswith("deletespesa"):
+        spesa_id = query.data.split()[1]
+        try:
+            db.delete_spesa(query.from_user.username ,spesa_id)
+        
+            # Modifica il messaggio originale per indicare che la spesa è stata eliminata
+            await query.message.reply_text("✅ Spesa eliminata con successo!")
+
+            logger.info(f"{query.from_user.username} | 201: Spesa eliminata")
+            context.user_data['contatore'] = 1
+            return ConversationHandler.END
+        except errors.DeleteError as e:
+            await query.message.edit_text(f"Errore, riprova {e}")
+            logger.error(f"{query.from_user.username} | 500: Errore {e}")
+        except  Exception as e:
+            await query.message.edit_text(f"Errore, riprova {e}")
+            logger.error(f"{query.from_user.username} | 500: Errore {e}")
+    elif query.data.startswith("deleteentrata"):
+        entrata_id = query.data.split()[1]
+        try:
+            db.delete_entrata(query.from_user.username ,entrata_id)
+        
+            # Modifica il messaggio originale per indicare che la spesa è stata eliminata
+            await query.message.reply_text("✅ Entrata eliminata con successo!")
+
+            logger.info(f"{query.from_user.username} | 201: Entrata eliminata")
+            context.user_data['contatore'] = 1
+            return ConversationHandler.END
+        except errors.DeleteError as e:
+            await query.message.edit_text(f"Errore, riprova {e}")
+            logger.error(f"{query.from_user.username} | 500: Errore {e}")
+        except  Exception as e:
+            await query.message.edit_text(f"Errore, riprova {e}")
+            logger.error(f"{query.from_user.username} | 500: Errore {e}")
+    elif query.data.startswith("deletespesacc"):
+        spesa_id = query.data.split()[1]
+        try:
+            db.delete_spesa_cc(query.from_user.username ,spesa_id)
+        
+            # Modifica il messaggio originale per indicare che la spesa è stata eliminata
+            await query.message.reply_text("✅ Spesa eliminata con successo!")
+
+            logger.info(f"{query.from_user.username} | 201: Spesa eliminata")
+            context.user_data['contatore'] = 1
+            return ConversationHandler.END
+        except errors.DeleteError as e:
+            await query.message.edit_text(f"Errore, riprova {e}")
+            logger.error(f"{query.from_user.username} | 500: Errore {e}")
+        except  Exception as e:
+            await query.message.edit_text(f"Errore, riprova {e}")
+            logger.error(f"{query.from_user.username} | 500: Errore {e}")
+    elif query.data.startswith("editspesa"):
+        spesa_id = query.data.split()[1]
+        context.user_data['spesa_id'] = spesa_id
+        await query.message.reply_text("Inserisci il nuovo importo")
+        return STATO2
+async def delete_spesa_cc(update: Update, context: CallbackContext):
+    try:
+        context.user_data['utente'] = update.message.from_user.username
+        spese = db.get_spesa_cc(update.message.from_user.username,datetime.now(TZ), datetime(1900,1,1,0,0,0))
+        spese.sort(key=lambda x: x.timestamp, reverse=True)
+        context.user_data['spese'] = spese
+        
+        try:
+            if context.user_data['contatore'] == None:
+                context.user_data['contatore'] = 1
+                
+        except:
+            context.user_data['contatore'] = 1
+            await update.message.reply_text("Quali spese vuoi eliminare?")
+        
+        spese = context.user_data['spese']
+        contatore = 0
+        while contatore < 5:
+            if context.user_data['contatore'] == len(spese) -1:
+                break
+            spesa = spese[context.user_data['contatore']]
+            context.user_data['contatore'] += 1
+            contatore += 1
+            keyboard = [InlineKeyboardButton("Elimina🗑️", callback_data=f"deletespesacc {spesa.id}")]
+            reply_markup = InlineKeyboardMarkup([keyboard])
+            await update.message.reply_text(f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€", reply_markup=reply_markup)
+        if context.user_data['contatore'] < len(spese)-1:
+            reply_keyboard = [["Vedi le prossime 5 spese"]]
+           
+            await update.message.reply_text("Vuoi vedere le prossime 5 spese?", reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+            return STATO1        
+    
+    except Exception as e:
+        await update.message.reply_text(f"Errore, riprova {e}")    
+                  
 def main():
     
     
@@ -533,6 +744,32 @@ def main():
 
     # Aggiungi il gestore per il comando /start
     application.add_handler(CommandHandler("start", crea_utente))
+    
+    edit_spesa_handler = ConversationHandler(
+        entry_points=[CommandHandler('editspesa', edit_spesa)],
+        states={STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_spesa), CallbackQueryHandler(button)],
+                STATO2: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_spesa_state2)]},
+        fallbacks=[CommandHandler('annulla', cancel)],
+    )
+    application.add_handler(edit_spesa_handler)
+    
+    delete_spesa_cc_handler = ConversationHandler(
+        entry_points=[CommandHandler('deletespesacc', delete_spesa_cc)],
+        states={STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, delete_spesa_cc),CallbackQueryHandler(button)]},
+        fallbacks=[CommandHandler('annulla', cancel)],)
+    application.add_handler(delete_spesa_cc_handler)
+    
+    delete_entrata_handler = ConversationHandler(
+        entry_points=[CommandHandler('deleteentrata', delete_entrata)],
+        states={STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, delete_entrata),CallbackQueryHandler(button)]},
+        fallbacks=[CommandHandler('annulla', cancel)],
+    )
+    
+    delete_spesa_handler = ConversationHandler(
+        entry_points=[CommandHandler('deletespesa', delete_spesa)],
+        states={STATO1: [MessageHandler(filters.TEXT & ~filters.COMMAND, delete_spesa),CallbackQueryHandler(button)]},
+        fallbacks=[CommandHandler('annulla', cancel)],
+    )
     getSpesa = ConversationHandler( 
         entry_points=[CommandHandler('getspese', get_spesa)],
             states=
@@ -594,7 +831,8 @@ def main():
     application.add_handler(addSpesaCc)
     application.add_handler(CommandHandler("getspesecc", get_spese_cc))
     application.add_handler(CommandHandler("getsaldo", get_saldo))
-
+    application.add_handler(delete_spesa_handler)
+    application.add_handler(delete_entrata_handler)
     # Avvia il bot
     application.run_polling()
 
