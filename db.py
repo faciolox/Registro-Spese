@@ -436,7 +436,7 @@ def set_budget(utente: str, budget: float) -> None:
                    """, (budget, utente))
     conn.commit()
     conn.close()
-    
+
 def get_budget(utente:str) -> float:
     """
     Restituisce il budget dell'utente
