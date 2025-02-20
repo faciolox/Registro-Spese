@@ -65,11 +65,21 @@ async def get_spesa_secondo_stato(update: Update, context: CallbackContext):
             fine = datetime.now(TZ)
             inizio = (datetime.now(TZ) - timedelta(days=30))
             spese = db.get_spesa(utente, fine,inizio)
-            if spese == []:
+            try:
+                if fine.day < 8:
+                    spese_cc = db.get_addebito(utente, (fine.month))
+                else: 
+                    spese_cc = db.get_addebito(utente, (fine.month+1)%12)
+                spese.append(spese_cc)
+                spese.sort(key=lambda x: x.timestamp)
+            except errors.NoAddebitoError:
+                spese_cc = None
+            if spese == [] and spese_cc == None:
                 await update.message.reply_text("Nessuna spesa trovata")
                 return ConversationHandler.END
             for spesa in spese:
                 out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
+            
             await update.message.reply_text(f"Spese:\n {out}")
             print(f"{datetime.now(TZ)} | {update.message.from_user.username} | 200: Spese trovate")
             return ConversationHandler.END
@@ -109,11 +119,15 @@ async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
         utente = update.message.from_user.username
         out = ''
         spese = db.get_spesa(utente, context.user_data['fine'], context.user_data['inizio'])
+        spese_cc = db.get_spesa_cc(utente, context.user_data['fine'], context.user_data['inizio'])
         if spese == []:
             await update.message.reply_text("Nessuna spesa trovata")
             return ConversationHandler.END
         for spesa in spese:
             out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
+        out += "Spese carta di credito:\n"
+        for spesa_cc in spese_cc:
+            out += f"{spesa_cc.descrizione} | {spesa_cc.timestamp} | Importo: {spesa_cc.importo}€ | Mensilità: {spesa_cc.mensilità} | Rata: {round(spesa_cc.importo/spesa_cc.mensilità,2)}\n"
         await update.message.reply_text(f"Spese:\n {out}")
         print(f"{datetime.now(TZ)} | {update.message.from_user.username} | 200: Spese trovate")
         return ConversationHandler.END

@@ -244,6 +244,7 @@ def get_spesa(utente_id: str, fine :datetime = datetime.now(),inizio :datetime =
         totale += spesa.importo
     spesa = spese.Spesa(totale, "Totale", fine)
     out.append(spesa)
+    
     return out
 
 def get_entrata(utente_id: str, fine: datetime =datetime.now(),inizio: datetime=None) -> list[entrate.Entrate]:
