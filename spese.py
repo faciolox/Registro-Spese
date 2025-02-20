@@ -2,14 +2,14 @@ from datetime import datetime
 
 
 class Spesa:
-    def __init__(self, importo, descrizione = None, timestamp = None ):
+    def __init__(self, importo:float , descrizione:str = None, timestamp: datetime = None ):
         self.importo = importo
         if not(descrizione):
             self.descrizione = ''
         else:
             self.descrizione = descrizione
         if not(timestamp):
-            self.timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            self.timestamp = datetime.now("Europe/Rome")
         
         elif type(timestamp) == str:
             
@@ -20,104 +20,30 @@ class Spesa:
                 try:
                     data, orario = timestamp.split(" ")
                     anno, mese, giorno = data.split("/")
-                    self.timestamp = f"{giorno}/{mese}/{anno} {orario}"
+                    self.timestamp = datetime(int(anno), int(mese), int(giorno), int(orario.split(":")[0]), int(orario.split(":")[1]), int(orario.split(":")[2]))
                 except:
                     raise ValueError("Timestamp non valido")
         else:
+            self.timestamp = timestamp
 
-            self.timestamp = timestamp.strftime("%Y/%m/%d %H:%M:%S")
-
-    def get_datetime(self):
+    def get_datetime(self) -> datetime:
         return datetime.strptime(self.timestamp, "%Y/%m/%d %H:%M:%S")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.descrizione} | {self.timestamp} | Importo: {self.importo}€"
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {"Orario": self.timestamp, "Descrizione": self.descrizione, "Importo": self.importo}
 
 class SpesaCc(Spesa):
-    def __init__(self, importo, descrizione = None, timestamp = None, mensilità = 1):
+    def __init__(self, importo:float, descrizione:str = None, timestamp:datetime = None, mensilità:int = 1):
         super().__init__(importo, descrizione, timestamp)
         self.mensilità = mensilità
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {"Orario": self.timestamp, "Descrizione": self.descrizione, "Importo": self.importo, "Mensilità": self.mensilità}
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.descrizione} | {self.timestamp} | Importo: {self.importo}€ | Mensilità: {self.mensilità}"
 
 
-def get_spesa_mensile(json_spese: [Spesa], mese = None, anno = datetime.now().year):
-    # Definizione range
-    out = []
-    totale = 0
-    now = datetime.today()
-    if not (mese):
-
-
-        mese = now.month
-
-    elif mese == 0:
-        mese = 12
-        anno = anno - 1
-    giorno = now.day
-    if giorno < 8:
-        if mese == 1:
-            mese = 12
-            anno = anno - 1
-        else:
-            mese -= 1
-    inizio, fine = datetime(anno, mese, 8), datetime(anno if mese < 12 else anno + 1, (mese % 12) + 1, 8)
-    for v in json_spese:
-        if inizio <= datetime.strptime(v["Orario"], "%Y/%m/%d %H:%M:%S") < fine:
-            sp = Spesa(v["Importo"], v["Descrizione"], datetime.strptime(v["Orario"], "%Y/%m/%d %H:%M:%S"))
-            out.append(sp)
-            totale += v["Importo"]
-    tot = Spesa(totale, 'Totale spese:')
-    out.append(tot)
-    return out
-
-def add_addebito_cc(json_spese:[Spesa],spesa,mensilità):
-    rata = spesa / mensilità
-    out = 0
-    month = datetime.today().month
-    year = datetime.today().year
-    for i in range(0, mensilità):
-        found = False
-        m = i + month
-        if i + month > 12:
-            m -= 12
-            for j in json_spese:
-                if datetime.strptime(j["Orario"], "%Y/%m/%d %H:%M:%S").month + 1== m and j["Descrizione"]== "Addebito c/c" and datetime.strptime(j["Orario"], "%Y/%m/%d %H:%M:%S").year == year:
-                    j["Importo"] += spesa
-                    found = True
-                    break
-            if not found:
-                sp = Spesa(rata,"Addebito c/c",datetime(year,m + 1,4,23,59))
-                json_spese.append(sp) 
-        else:
-            for j in json_spese:
-                if datetime.strptime(j["Orario"], "%Y/%m/%d %H:%M:%S").month + 1 == m and j["Descrizione"] == "Addebito c/c" and datetime.strptime(j["Orario"], "%Y/%m/%d %H:%M:%S").year == year:
-                    j["Importo"] += spesa
-                    found = True
-                    break
-            if not found:
-                if m + 1 == 13:
-                    sp = Spesa(rata,"Addebito c/c",datetime(year,1,4,23,59))
-                else:
-                    sp = Spesa(rata,"Addebito c/c",datetime(year,m +1,4,23,59))
-                json_spese.append(sp.to_dict()) 
-
-def add_spesa(json_spese: [Spesa], spesa,descrizione = None):
-    spesa = Spesa(spesa, descrizione)
-    json_spese.append(spesa.to_dict())
-    return spesa
-
-def get_spesa_intervallo(json_spese: [Spesa], inizio, fine = datetime.now()):
-    totale = 0
-    for v in json_spese:
-        if inizio <= datetime.strptime(v["Orario"], "%Y/%m/%d %H:%M:%S") < fine:
-            totale += v["Importo"]
-    tot = Spesa(totale, 'Totale:')
-    return tot
