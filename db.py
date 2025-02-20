@@ -459,6 +459,33 @@ def get_budget(utente:str) -> float:
     else:
         return risultato[0]
 
+def get_addebito(utente:str, mese: int) -> spese.Spesa:
+    """Dato un utente restituisce il prossimo addebito relativo alla carta di credito
+
+    Args:
+        utente (str): username dell'utente
+
+    Returns:
+        spese.Spesa: Prossimo addebito
+    
+    Raises:
+        errors.NoAddebitoError: Se non è presente nessun addebito per l'utente
+    """
+    data_addebito = datetime(datetime.now().year, mese, 4, 23, 59, 59)
+    
+    conn = sqlite3.connect("spese.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT * FROM spese WHERE utente = ? AND descrizione = "Addebito carta di credito" AND data = ? ORDER BY data ASC LIMIT 1
+                   """, (utente,data_addebito.strftime("%Y/%m/%d %H:%M:%S")))
+    risultato = cursor.fetchone()
+    conn.close()
+    
+    if risultato == None:
+        raise errors.NoAddebitoError("Nessun addebito trovato")
+    else:
+        return spese.Spesa(risultato[3], risultato[2], risultato[4])
+        
     
     
 

@@ -9,3 +9,9 @@ class CreateUserError(Exception):
 class BudgetNotFound(Exception):
     def __init__(self, messaggio):
         super().__init__(messaggio)
+class NoAddebitoError(Exception):
+    def __init__(self, messaggio):
+        super().__init__(messaggio)
+class GenericError(Exception):
+    def __init__(self, messaggio):
+        super().__init__(messaggio)
