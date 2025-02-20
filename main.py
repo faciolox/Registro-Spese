@@ -10,9 +10,8 @@ from telegram.ext import Application, filters, MessageHandler, CommandHandler, C
 
 import entrate
 import errors
-import excel
 from entrate import Entrate
-from excel import add_stipendio
+
 import migrations
 import spese
 from spese import Spesa
