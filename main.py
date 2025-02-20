@@ -13,6 +13,7 @@ import errors
 import excel
 from entrate import Entrate
 from excel import add_stipendio
+import migrations
 import spese
 from spese import Spesa
 import db
@@ -434,19 +435,19 @@ async def get_budget(update: Update, context: CallbackContext):
         #calcolo budget settimanale
         delta_days = fine -  datetime.now(TZ)
         settimane_rimanenti = math.ceil(delta_days.days/7)
-        budget_settimanale_rimanente = round(budget_rimanente/settimane_rimanenti,2)
         inizio_oggi = datetime(datetime.now(TZ).year, datetime.now(TZ).month, datetime.now(TZ).day,0,0,0)
         inizio_oggi = TZ.localize(inizio_oggi)
         weekday = datetime.now(TZ).weekday()
         delta_fine = 7-weekday
         inizio_settimana = inizio_oggi - timedelta(days=weekday)
-        budget_settimanale_rimanente = round((budget - db.get_spesa(inizio, inizio_settimana)[-1].importo ) / settimane_rimanenti,2)
+        spesa_precedente = db.get_spesa(utente, inizio_settimana, inizio)[-1].importo
+        budget_settimanale_rimanente = round((budget - spesa_precedente ) / settimane_rimanenti,2)
         fine_settimana = inizio_oggi + timedelta(days=delta_fine)
         spesa_settimanale = db.get_spesa(utente, fine_settimana, inizio_settimana)
         if spesa_settimanale[-1].importo > budget_settimanale_rimanente:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget settimanale di {round(spesa_settimanale[-1].importo - budget_settimanale_rimanente)} Euro\n Il budget settimanale è di {budget_settimanale_rimanente} Euro")
         else:
-            await update.message.reply_text(f"A fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {budget_settimanale_rimanente} Euro. ")
+            await update.message.reply_text(f"A fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {round(budget_settimanale_rimanente - spesa_settimanale[-1].importo,2)} Euro. ")
         
 
         
@@ -542,5 +543,6 @@ def main():
     application.run_polling()
 
 if __name__ == '__main__':
-    db.init_db()
+    db.init_db() 
+    migrations.main()
     main()

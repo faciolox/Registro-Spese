@@ -134,7 +134,7 @@ def salva_entrata(utente_id, descrizione, importo, data):
     conn.commit()
     conn.close()
     
-def get_spesa(utente_id, fine=datetime.now(),inizio=None) -> List[spese.Spesa]:
+def get_spesa(utente_id, fine=datetime.now(),inizio=None):
     sqlite3.register_adapter(datetime,adapt_datetime)
     sqlite3.register_converter("datetime",convert_datetime)
     
@@ -309,6 +309,7 @@ def set_budget(utente, budget):
     conn.close()
     
 def get_budget(utente):
+
     conn = sqlite3.connect("utente.db")
     cursor = conn.cursor()
     cursor.execute("""
