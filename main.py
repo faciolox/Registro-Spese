@@ -460,6 +460,7 @@ async def get_budget(update: Update, context: CallbackContext):
         
         # Trovo l'addebito della carta di credito
         try:
+            addebito = spese.Spesa(0,"Addebito")
             now = datetime.now(TZ)
             if now.day < 8:
                 mese = now.month
@@ -467,7 +468,7 @@ async def get_budget(update: Update, context: CallbackContext):
                 mese = (now.month + 1) % 12
             addebito = db.get_addebito(utente,mese)
         except errors.NoAddebitoError:
-            addebito = 0
+            addebito.importo = 0
         except Exception as e2:
             await update.message.reply_text(f"Errore, riprova {e2}")
             logger.error(f"{update.message.from_user.username} | 500: Errore {e2}")

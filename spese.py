@@ -10,8 +10,8 @@ class Spesa:
             self.descrizione = ''
         else:
             self.descrizione = descrizione
-        if not(timestamp):
-            self.timestamp = datetime.now("Europe/Rome")
+        if timestamp == None:
+            self.timestamp = datetime.now()
         
         elif type(timestamp) == str:
             
