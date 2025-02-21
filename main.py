@@ -297,6 +297,7 @@ async def cancel(update: Update, context):
     """Interrompe la conversazione."""
     await update.message.reply_text("Operazione annullata.")
     logger.warning(f"{update.message.from_user.username} | 400: Operazione annullata")
+    context.user_data.clear()
     return ConversationHandler.END
 
 async def debug(update: Update, context: CallbackContext):
@@ -535,7 +536,7 @@ async def delete_spesa(update: Update, context: CallbackContext):
         spese = context.user_data['spese']
         contatore = 0
         while contatore < 5:
-            if context.user_data['contatore'] == len(spese) -1:
+            if context.user_data['contatore'] == len(spese):
                 break
             spesa = spese[context.user_data['contatore']]
             context.user_data['contatore'] += 1
@@ -543,7 +544,7 @@ async def delete_spesa(update: Update, context: CallbackContext):
             keyboard = [InlineKeyboardButton("Elimina🗑️", callback_data=f"deletespesa {spesa.id}")]
             reply_markup = InlineKeyboardMarkup([keyboard])
             await update.message.reply_text(f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€", reply_markup=reply_markup)
-        if context.user_data['contatore'] < len(spese)-1:
+        if context.user_data['contatore'] < len(spese):
             reply_keyboard = [["Vedi le prossime 5 spese"]]
            
             await update.message.reply_text("Vuoi vedere le prossime 5 spese?", reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
@@ -646,6 +647,7 @@ async def button(update: Update, context: CallbackContext):
 
             logger.info(f"{query.from_user.username} | 201: Spesa eliminata")
             context.user_data['contatore'] = 1
+            context.user_data.clear()
             return ConversationHandler.END
         except errors.DeleteError as e:
             await query.message.edit_text(f"Errore, riprova {e}")
@@ -663,6 +665,7 @@ async def button(update: Update, context: CallbackContext):
 
             logger.info(f"{query.from_user.username} | 201: Entrata eliminata")
             context.user_data['contatore'] = 1
+            context.user_data.clear()
             return ConversationHandler.END
         except errors.DeleteError as e:
             await query.message.edit_text(f"Errore, riprova {e}")
@@ -680,6 +683,7 @@ async def button(update: Update, context: CallbackContext):
 
             logger.info(f"{query.from_user.username} | 201: Spesa eliminata")
             context.user_data['contatore'] = 1
+            context.user_data.clear()
             return ConversationHandler.END
         except errors.DeleteError as e:
             await query.message.edit_text(f"Errore, riprova {e}")
