@@ -449,9 +449,11 @@ async def set_budget_state2(update: Update, context: CallbackContext):
 
 async def get_budget(update: Update, context: CallbackContext):
     try:
+        logger.info(f"{update.message.from_user.username} | Richiesta get budget")
         utente = update.message.from_user.username
         budget = db.get_budget(utente)
         if budget == None:
+            logger.warning(f"{update.message.from_user.username} | 404: Budget non impostato")
             await update.message.reply_text("Budget non impostato, clicca su /setbudget per impostarlo")
             return ConversationHandler.END
         await update.message.reply_text(f"Budget mensile: {budget} Euro")
@@ -468,6 +470,7 @@ async def get_budget(update: Update, context: CallbackContext):
             addebito = 0
         except Exception as e2:
             await update.message.reply_text(f"Errore, riprova {e2}")
+            logger.error(f"{update.message.from_user.username} | 500: Errore {e2}")
             return ConversationHandler.END
         finally: 
             
@@ -510,8 +513,7 @@ async def get_budget(update: Update, context: CallbackContext):
             if spesa_settimanale[-1].importo > budget_settimanale_rimanente:
                 await update.message.reply_text(f"ATTENZIONE! Hai superato il budget settimanale di {round(spesa_settimanale[-1].importo - budget_settimanale_rimanente)} Euro per la settimana che va dal {inizio_settimana} al {fine_settimana}\n Il budget settimanale è di {budget_settimanale_rimanente} Euro")
             else:
-                await update.message.reply_text(f"Con un budget settimanale di: {budget} Euro per la settimana che va dal {inizio_settimana.date().strftime("%d-%m-%Y")} al {fine_settimana.date().strftime("%d-%m-%Y")}")
-                await update.message.reply_text(f"A fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {round(budget_settimanale_rimanente - spesa_settimanale[-1].importo,2)} Euro. ")
+                await update.message.reply_text(f"Con un budget settimanale di: {budget_settimanale_rimanente} Euro per la settimana che va dal {inizio_settimana.date().strftime("%d-%m-%Y")} al {fine_settimana.date().strftime("%d-%m-%Y")}\nA fronte di una spesa di {round(spesa_settimanale[-1].importo,2)} Euro, questa settimana puoi spendere ancora {round(budget_settimanale_rimanente - spesa_settimanale[-1].importo,2)} Euro.")
                 
 
             
@@ -525,7 +527,9 @@ async def get_budget(update: Update, context: CallbackContext):
                 await update.message.reply_text(f"ATTENZIONE! Hai superato il budget giornaliero di {round(spesa_giornaliera[-1].importo - budget_giornaliero,2)} Euro. \n Il budget giornaliero è di {budget_giornaliero} Euro")
             else:
                 await update.message.reply_text(f"A fronte di una spesa di {round(spesa_giornaliera[-1].importo,2)} Euro, oggi puoi spendere ancora {round(budget_giornaliero-spesa_giornaliera[-1].importo,2)} Euro")        
+        logger.info(f"{update.message.from_user.username} | 200: Budget trovato")
     except Exception as e:
+        logger.error(f"{update.message.from_user.username} | 500: Errore {e}")
         await update.message.reply_text(f"Errore, riprova {e}")
 
 
