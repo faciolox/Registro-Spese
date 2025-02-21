@@ -103,8 +103,13 @@ async def get_spesa_secondo_stato(update: Update, context: CallbackContext):
                 await update.message.reply_text("Nessuna spesa trovata")
                 return ConversationHandler.END
             for spesa in spese:
-                out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
-            
+                if spesa.descrizione == "Totale":
+                    totale = spesa
+                    if spese_cc != None:
+                        totale.importo += spese_cc.importo
+                else:   
+                    out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
+            out += f"Totale spese: {totale.importo}€"
             await update.message.reply_text(f"Spese:\n {out}")
             logger.info(f"{update.message.from_user.username} | 200: Spese trovate")
             return ConversationHandler.END
@@ -149,10 +154,16 @@ async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
             await update.message.reply_text("Nessuna spesa trovata")
             return ConversationHandler.END
         for spesa in spese:
+            if spesa.descrizione == "Totale":
+                totale = spesa
+                break
             out += f"{spesa.descrizione} | {spesa.timestamp} | Importo: {spesa.importo}€\n"
         out += "Spese carta di credito:\n"
         for spesa_cc in spese_cc:
             out += f"{spesa_cc.descrizione} | {spesa_cc.timestamp} | Importo: {spesa_cc.importo}€ | Mensilità: {spesa_cc.mensilità} | Rata: {round(spesa_cc.importo/spesa_cc.mensilità,2)}\n"
+            totale.importo += spesa_cc.importo
+        out += f"Totale spese: {totale.importo}€"
+        logger.info(out)
         await update.message.reply_text(f"Spese:\n {out}")
         logger.info(f"{update.message.from_user.username} | 200: Spese trovate")
         return ConversationHandler.END
