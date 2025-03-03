@@ -149,7 +149,7 @@ async def get_spesa_quarto_stato(update: Update, context: CallbackContext):
         utente = update.message.from_user.username
         out = ''
         spese = db.get_spesa(utente, context.user_data['fine'], context.user_data['inizio'])
-        spese_cc = db.get_spesa_cc(utente, context.user_data['fine'], context.user_data['inizio'])
+        spese_cc = db.get_spesa_cc_date(utente, context.user_data['fine'], context.user_data['inizio'])
         if spese == []:
             await update.message.reply_text("Nessuna spesa trovata")
             return ConversationHandler.END
@@ -416,7 +416,7 @@ async def get_spese_cc(update: Update, context: CallbackContext):
         for spesa in spese:
             if spesa.descrizione == "Totale":
                 break
-            ts_spesa = spesa.timestamp
+            ts_spesa = spesa.timestampd
             end = ts_spesa + relativedelta(months=spesa.mensilità)
             accredito = datetime.now(TZ) + relativedelta(months=1)
             accredito = datetime(accredito.year, accredito.month, 5,0,0,0)
@@ -717,7 +717,7 @@ async def button(update: Update, context: CallbackContext):
 async def delete_spesa_cc(update: Update, context: CallbackContext):
     try:
         context.user_data['utente'] = update.message.from_user.username
-        spese = db.get_spesa_cc(update.message.from_user.username,datetime.now(TZ), datetime(1900,1,1,0,0,0))
+        spese = db.get_spesa_cc_date(update.message.from_user.username,datetime.now(TZ), datetime(1900,1,1,0,0,0))
         spese.sort(key=lambda x: x.timestamp, reverse=True)
         context.user_data['spese'] = spese
         
