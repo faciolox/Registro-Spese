@@ -370,7 +370,7 @@ def get_spesa_cc_date(utente_id, fine=datetime.now(),inizio=None) -> List[spese.
         spesa = spese.SpesaCc(riga[3],riga[2],riga[4],riga[5],riga[0])
         out.append(spesa)
         totale += spesa.importo
-    spesa = spese.SpesaCc(totale, "Totale", fine,0)
+    spesa = spese.SpesaCc(totale, "Totale", fine,1)
     out.append(spesa)
     return out
     
