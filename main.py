@@ -353,7 +353,9 @@ async def add_spesa_cc_state2(update: Update, context: CallbackContext):
                 fine = datetime(datetime.now(TZ).year, datetime.now(TZ).month+1, 8,0,0,0)
         spese_mensili = db.get_spesa(utente, fine, inizio)
         totale = spese_mensili[-1]
-        if totale.importo > budget:
+        if budget == None:
+            await update.message.reply_text("Budget non impostato, clicca su /setbudget per impostarlo")
+        elif totale.importo > budget:
             await update.message.reply_text(f"ATTENZIONE! Hai superato il budget mensile di {totale.importo - budget} Euro")
         else:
             await update.message.reply_text(f"A fronte di una spesa di {round(totale.importo,2)} Euro, questo mese puoi spendere ancora {round(budget-totale.importo, 2)} Euro")
@@ -409,12 +411,12 @@ async def get_spese_cc(update: Update, context: CallbackContext):
         tot = 0
         utente = update.message.from_user.username
         fine = datetime.now(TZ) - timedelta(days=365)
-        spese = db.get_spesa_cc(utente, datetime.now(TZ), fine)
+        spese = db.get_spesa_cc_date(utente, datetime.now(TZ), fine)
         out = ''
         for spesa in spese:
             if spesa.descrizione == "Totale":
                 break
-            ts_spesa = datetime.strptime(spesa.timestamp, "%Y/%m/%d %H:%M:%S")
+            ts_spesa = spesa.timestamp
             end = ts_spesa + relativedelta(months=spesa.mensilità)
             accredito = datetime.now(TZ) + relativedelta(months=1)
             accredito = datetime(accredito.year, accredito.month, 5,0,0,0)

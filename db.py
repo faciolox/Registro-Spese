@@ -319,7 +319,7 @@ def add_spesa_cc(utente: str,importo:float ,descrizione:str = '',data:datetime =
     cursor = conn.cursor()
     ts_dt = datetime.strptime(ts,"%Y/%m/%d %H:%M:%S")
     if ts_dt.day < 8:
-        ts_dt.day = 9
+        ts_dt.replace(day=9)
         ts = ts_dt.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
                    SELECT * FROM spese WHERE utente  = ? AND data > ? and descrizione = ? ORDER BY data ASC """
@@ -328,7 +328,7 @@ def add_spesa_cc(utente: str,importo:float ,descrizione:str = '',data:datetime =
     for i in range(1,mensilita+1):
         found = False
         if ts_dt.month + i > 12:
-            ts_dt.month = 1
+            ts_dt.replace(month=1)
             ts_dt.year += 1
             ts_addebito = datetime(ts_dt.year+1,1,4,23,59,59).strftime("%Y/%m/%d %H:%M:%S")
         else:
@@ -348,7 +348,7 @@ def add_spesa_cc(utente: str,importo:float ,descrizione:str = '',data:datetime =
     conn.commit()
     conn.close()
 
-def get_spesa_cc(utente_id, fine=datetime.now(),inizio=None) -> List[spese.SpesaCc]:
+def get_spesa_cc_date(utente_id, fine=datetime.now(),inizio=None) -> List[spese.SpesaCc]:
     out = []
     spesa = spese.SpesaCc
     if inizio == None:
