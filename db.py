@@ -200,7 +200,7 @@ def salva_entrata(utente_id:str, descrizione:str, importo:float, data:datetime) 
     """
     conn = sqlite3.connect("entrate.db")
     cursor = conn.cursor()
-    ts = ts.strftime("%Y/%m/%d %H:%M:%S")
+    ts = data.strftime("%Y/%m/%d %H:%M:%S")
     cursor.execute("""
                     INSERT INTO entrate (utente,  descrizione, importo, data) VALUES (?, ? ,?, ?)
                     """, (utente_id, descrizione, importo, ts))

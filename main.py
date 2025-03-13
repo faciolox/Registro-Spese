@@ -416,7 +416,7 @@ async def get_spese_cc(update: Update, context: CallbackContext):
         for spesa in spese:
             if spesa.descrizione == "Totale":
                 break
-            ts_spesa = spesa.timestampd
+            ts_spesa = spesa.timestamp
             end = ts_spesa + relativedelta(months=spesa.mensilità)
             accredito = datetime.now(TZ) + relativedelta(months=1)
             accredito = datetime(accredito.year, accredito.month, 5,0,0,0)
